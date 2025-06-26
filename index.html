@@ -1082,44 +1082,41 @@
         }
 
         async function loadData() {
-            showLoading(true); // Mostrar indicador de carga
+            showLoading(true);
             try {
-                // Obtener datos de activos
+                // Ensure your backend `doGet` functions are named 'getAssets' and 'getExits'
                 const assetsResponse = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getAssets');
                 const assetsResult = await assetsResponse.json();
                 if (assetsResult.success) {
-                    assetsData = assetsResult.data || [];
+                    assetsData = assetsResult.data || []; // Expecting 'data' key from backend
                 } else {
                     console.error('Error al obtener activos:', assetsResult.message);
-                    assetsData = []; // Clear data on error
+                    assetsData = [];
                 }
 
-                // Obtener datos de salidas
                 const exitsResponse = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getExits');
                 const exitsResult = await exitsResponse.json();
                 if (exitsResult.success) {
-                    exitsData = exitsResult.data || [];
+                    exitsData = exitsResult.data || []; // Expecting 'data' key from backend
                 } else {
                     console.error('Error al obtener salidas:', exitsResult.message);
-                    exitsData = []; // Clear data on error
+                    exitsData = [];
                 }
                 
-                // Actualizar UI con los nuevos datos
                 updateDashboard();
                 loadAssetsTable();
-                loadAssetOptions(); // Asegurarse de que las opciones se carguen después de tener los assetsData
+                loadAssetOptions();
                 
             } catch (error) {
                 console.error('Error de comunicación al cargar datos:', error);
                 alert('Error al cargar datos del servidor. Por favor, verifica tu conexión o la URL del Apps Script: ' + error.message);
-                // Si hay un error, limpiar los datos para evitar mostrar información incorrecta
                 assetsData = [];
                 exitsData = [];
                 updateDashboard();
                 loadAssetsTable();
                 loadAssetOptions();
             } finally {
-                showLoading(false); // Ocultar indicador de carga
+                showLoading(false);
             }
         }
 
@@ -1271,29 +1268,28 @@
             loading.style.display = 'none';
         }
 
-        async function sendToGoogleSheets(data) {
-            console.log('Sending to Google Sheets:', data); // Confirm what's being sent
+              async function sendToGoogleSheets(data) {
+            console.log('Sending to Google Sheets:', data);
             try {
                 const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-                    method: 'POST',
+                    method: 'POST', // This is what triggers the POST in doPost
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json', // This header is important for the backend to parse JSON
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(data) // Your data is sent as JSON
                 });
-                
+
                 if (!response.ok) {
-                    // Si la respuesta no es OK (ej. 404, 500), lanzamos un error
                     const errorText = await response.text();
                     throw new Error(`Error de red o servidor (${response.status}): ${errorText}`);
                 }
 
                 const result = await response.json();
-                return result; // Tu Apps Script ya devuelve { success: true/false, message: ..., data: ... }
+                return result;
                 
             } catch (error) {
                 console.error('Error en sendToGoogleSheets:', error);
-                throw error; // Re-lanzar el error para que sea manejado por el llamador
+                throw error;
             }
         }
 
