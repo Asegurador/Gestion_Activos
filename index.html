@@ -17,477 +17,477 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
- @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
-/* Variables existentes - Mantienen su propósito para el resto de tu aplicación */
-:root {
-    --primary-color: #1e293b;
-    --secondary-color: #334155;
-    --accent-color: #3b82f6;
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-    --light-bg: #f8fafc;
-    --border-color: #e2e8f0;
-}
+        /* Variables existentes - Mantienen su propósito para el resto de tu aplicación */
+        :root {
+            --primary-color: #1e293b;
+            --secondary-color: #334155;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-bg: #f8fafc;
+            --border-color: #e2e8f0;
+        }
 
-/* Reseteo global */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    /* La fuente Montserrat se aplica aquí para el login y potencialmente para toda la app si no se sobrescribe */
-    font-family: 'Montserrat', sans-serif;
-}
+        /* Reseteo global */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* La fuente Montserrat se aplica aquí para el login y potencialmente para toda la app si no se sobrescribe */
+            font-family: 'Montserrat', sans-serif;
+        }
 
-/* Estilos base del body - Mantienen tu fondo gradiente para el resto de la app si el login no está activo */
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Mantiene tu fuente original para el resto de la app */
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    color: var(--primary-color);
-    line-height: 1.6;
-}
+        /* Estilos base del body - Mantienen tu fondo gradiente para el resto de la app si el login no está activo */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Mantiene tu fuente original para el resto de la app */
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--primary-color);
+            line-height: 1.6;
+        }
 
-/* --- Estilos del Nuevo Login "AuraSys" --- */
+        /* --- Estilos del Nuevo Login "AuraSys" --- */
 
-/* Contenedor principal del login */
-.wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh; /* Asegura que ocupe al menos el 100% del alto de la ventana */
-    width: 100%;
-    background: url('https://codingstella.com/wp-content/uploads/2024/01/download-5.jpeg') no-repeat;
-    background-size: cover;
-    background-position: center;
-    animation: animateBg 5s linear infinite;
-    /* Asegura que el wrapper del login sobrescriba el fondo del body cuando el login está visible */
-    position: absolute; /* Para que ocupe toda la pantalla y no afecte el layout del body */
-    top: 0;
-    left: 0;
-    z-index: 999; /* Asegura que esté por encima de otros elementos si existen */
-}
+        /* Contenedor principal del login */
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Asegura que ocupe al menos el 100% del alto de la ventana */
+            width: 100%;
+            background: url('https://codingstella.com/wp-content/uploads/2024/01/download-5.jpeg') no-repeat;
+            background-size: cover;
+            background-position: center;
+            animation: animateBg 5s linear infinite;
+            /* Asegura que el wrapper del login sobrescriba el fondo del body cuando el login está visible */
+            position: absolute; /* Para que ocupe toda la pantalla y no afecte el layout del body */
+            top: 0;
+            left: 0;
+            z-index: 999; /* Asegura que esté por encima de otros elementos si existen */
+        }
 
-@keyframes animateBg {
-    100% {
-        filter: hue-rotate(360deg);
-    }
-}
+        @keyframes animateBg {
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
 
-/* Caja del formulario de login */
-.login-box {
-    position: relative;
-    width: 400px;
-    height: 450px;
-    background: transparent;
-    border-radius: 15px;
-    border: 2px solid rgba(255, 255, 255, .5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(15px);
-    padding: 20px; /* Añade un poco de padding para evitar que el contenido toque los bordes */
-}
+        /* Caja del formulario de login */
+        .login-box {
+            position: relative;
+            width: 400px;
+            height: 450px;
+            background: transparent;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, .5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(15px);
+            padding: 20px; /* Añade un poco de padding para evitar que el contenido toque los bordes */
+        }
 
-.login-box h2 {
-    font-size: 2.2em; /* Ligeramente más grande para más impacto */
-    color: #fff;
-    text-align: center;
-    margin-bottom: 30px; /* Espacio debajo del título */
-}
+        .login-box h2 {
+            font-size: 2.2em; /* Ligeramente más grande para más impacto */
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px; /* Espacio debajo del título */
+        }
 
-/* Caja de entrada de texto */
-.input-box {
-    position: relative;
-    width: 100%; /* Ocupa el 100% del ancho de .login-box */
-    height: 50px;
-    margin-bottom: 30px; /* Espacio entre las cajas de entrada */
-    border-bottom: 2px solid #fff; /* Más prominente */
-}
+        /* Caja de entrada de texto */
+        .input-box {
+            position: relative;
+            width: 100%; /* Ocupa el 100% del ancho de .login-box */
+            height: 50px;
+            margin-bottom: 30px; /* Espacio entre las cajas de entrada */
+            border-bottom: 2px solid #fff; /* Más prominente */
+        }
 
-.input-box label {
-    position: absolute;
-    top: 50%;
-    left: 5px;
-    transform: translateY(-50%);
-    font-size: 1.1em; /* Ligeramente más grande */
-    color: #fff;
-    pointer-events: none;
-    transition: .5s;
-}
+        .input-box label {
+            position: absolute;
+            top: 50%;
+            left: 5px;
+            transform: translateY(-50%);
+            font-size: 1.1em; /* Ligeramente más grande */
+            color: #fff;
+            pointer-events: none;
+            transition: .5s;
+        }
 
-.input-box input:focus ~ label,
-.input-box input:valid ~ label {
-    top: -5px;
-    font-size: 0.9em; /* Más pequeño al enfocar/validar */
-    color: #fff; /* Asegura que el color siga blanco */
-}
+        .input-box input:focus ~ label,
+        .input-box input:valid ~ label {
+            top: -5px;
+            font-size: 0.9em; /* Más pequeño al enfocar/validar */
+            color: #fff; /* Asegura que el color siga blanco */
+        }
 
-.input-box input {
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 1.1em; /* Más grande para mejor legibilidad */
-    color: #fff;
-    padding: 0 35px 0 5px;
-}
+        .input-box input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 1.1em; /* Más grande para mejor legibilidad */
+            color: #fff;
+            padding: 0 35px 0 5px;
+        }
 
-.input-box .icon {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    color: #fff;
-    transform: translateY(-50%);
-    font-size: 1.2em; /* Iconos un poco más grandes */
-}
+        .input-box .icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            color: #fff;
+            transform: translateY(-50%);
+            font-size: 1.2em; /* Iconos un poco más grandes */
+        }
 
-/* Botón de login */
-.wrapper button {
-    width: 100%;
-    height: 45px; /* Ligeramente más alto */
-    background-color: #fff;
-    border: none;
-    border-radius: 40px;
-    cursor: pointer;
-    font-size: 1.1em; /* Más grande */
-    color: #000;
-    font-weight: 600; /* Más negrita */
-    margin-top: 20px; /* Espacio superior */
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
+        /* Botón de login */
+        .wrapper button {
+            width: 100%;
+            height: 45px; /* Ligeramente más alto */
+            background-color: #fff;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1.1em; /* Más grande */
+            color: #000;
+            font-weight: 600; /* Más negrita */
+            margin-top: 20px; /* Espacio superior */
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
 
-.wrapper button:hover {
-    background-color: #f0f0f0; /* Un ligero cambio al pasar el ratón */
-    transform: translateY(-2px); /* Pequeño efecto de elevación */
-}
+        .wrapper button:hover {
+            background-color: #f0f0f0; /* Un ligero cambio al pasar el ratón */
+            transform: translateY(-2px); /* Pequeño efecto de elevación */
+        }
 
-/* Enlace de registro/olvidaste contraseña */
-.register-link {
-    font-size: .9em;
-    color: #fff;
-    text-align: center;
-    margin-top: 25px;
-}
+        /* Enlace de registro/olvidaste contraseña */
+        .register-link {
+            font-size: .9em;
+            color: #fff;
+            text-align: center;
+            margin-top: 25px;
+        }
 
-.register-link p a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-}
+        .register-link p a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-.register-link p a:hover {
-    text-decoration: underline;
-}
+        .register-link p a:hover {
+            text-decoration: underline;
+        }
 
-/* Media Queries para Responsive Design del Login */
-@media (max-width: 500px) {
-    .login-box {
-        width: 90%; /* Ajusta el ancho en pantallas pequeñas */
-        height: auto; /* Altura automática para adaptarse al contenido */
-        border: none;
-        border-radius: 0;
-        padding: 20px; /* Ajusta el padding para pantallas pequeñas */
-    }
-    .input-box {
-        width: 100%; /* Asegura que la caja de entrada ocupe todo el ancho disponible */
-    }
-    .wrapper {
-        background-position: left center; /* Ajusta la posición de la imagen de fondo */
-    }
-}
+        /* Media Queries para Responsive Design del Login */
+        @media (max-width: 500px) {
+            .login-box {
+                width: 90%; /* Ajusta el ancho en pantallas pequeñas */
+                height: auto; /* Altura automática para adaptarse al contenido */
+                border: none;
+                border-radius: 0;
+                padding: 20px; /* Ajusta el padding para pantallas pequeñas */
+            }
+            .input-box {
+                width: 100%; /* Asegura que la caja de entrada ocupe todo el ancho disponible */
+            }
+            .wrapper {
+                background-position: left center; /* Ajusta la posición de la imagen de fondo */
+            }
+        }
 
-/* --- Tus estilos originales que no deben ser afectados --- */
+        /* --- Tus estilos originales que no deben ser afectados --- */
 
-/* OCULTA EL CONTENEDOR DE LOGIN ANTIGUO */
-#loginScreen.login-container {
-    display: none; /* Asegura que tu login antiguo no se muestre */
-}
+        /* OCULTA EL CONTENEDOR DE LOGIN ANTIGUO */
+        #loginScreen.login-container {
+            display: none; /* Asegura que tu login antiguo no se muestre */
+        }
 
-/* Clases de utilidad y componentes (glass-card, nav-item, buttons, etc.) */
-.glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
+        /* Clases de utilidad y componentes (glass-card, nav-item, buttons, etc.) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
 
-.nav-item {
-    margin: 0 8px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
+        .nav-item {
+            margin: 0 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
 
-.nav-item:hover {
-    background: rgba(59, 130, 246, 0.1);
-    transform: translateY(-2px);
-}
+        .nav-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
 
-.nav-item.active {
-    background: var(--accent-color);
-    color: white;
-}
+        .nav-item.active {
+            background: var(--accent-color);
+            color: white;
+        }
 
-.btn-modern {
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
+        .btn-modern {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-.btn-modern:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
-}
+        .btn-modern:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
 
-.btn-modern:hover:before {
-    left: 100%;
-}
+        .btn-modern:hover:before {
+            left: 100%;
+        }
 
-.btn-primary-modern {
-    background: linear-gradient(135deg, var(--accent-color), #2563eb);
-    color: white;
-}
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--accent-color), #2563eb);
+            color: white;
+        }
 
-.btn-success-modern {
-    background: linear-gradient(135deg, var(--success-color), #059669);
-    color: white;
-}
+        .btn-success-modern {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+        }
 
-.btn-danger-modern {
-    background: linear-gradient(135deg, var(--danger-color), #dc2626);
-    color: white;
-}
+        .btn-danger-modern {
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+        }
 
-.form-control {
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px 16px;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.9);
-}
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
 
-.form-control:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-    background: white;
-}
+        .form-control:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+            background: white;
+        }
 
-.table-container {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
+        .table-container {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
 
-.table-modern {
-    margin: 0;
-    background: white;
-}
+        .table-modern {
+            margin: 0;
+            background: white;
+        }
 
-.table-modern th {
-    background: var(--primary-color);
-    color: white;
-    font-weight: 600;
-    padding: 16px;
-    border: none;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-}
+        .table-modern th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 16px;
+            border: none;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
 
-.table-modern td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    vertical-align: middle;
-}
+        .table-modern td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
 
-.table-modern tr:hover {
-    background: rgba(59, 130, 246, 0.05);
-}
+        .table-modern tr:hover {
+            background: rgba(59, 130, 246, 0.05);
+        }
 
-.badge-custom {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
+        .badge-custom {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
 
-.badge-success {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--success-color);
-    border: 1px solid rgba(16, 185, 129, 0.2);
-}
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
 
-.badge-danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger-color);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
 
-.badge-primary {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--accent-color);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
+        .badge-primary {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
 
-/* Old login-container and login-card, will be hidden */
-/* You had this in your original CSS, I've just added `display: none;` above */
-.login-container {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+        /* Old login-container and login-card, will be hidden */
+        /* You had this in your original CSS, I've just added `display: none;` above */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
 
-.login-card {
-    width: 100%;
-    max-width: 400px;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
 
-/* Sidebar y Main Content */
-.sidebar {
-    background: var(--primary-color);
-    color: white;
-    height: 100vh;
-    padding: 20px 0;
-    position: fixed;
-    width: 250px;
-    left: 0;
-    top: 0;
-    z-index: 1000;
-    transition: all 0.3s ease;
-}
+        /* Sidebar y Main Content */
+        .sidebar {
+            background: var(--primary-color);
+            color: white;
+            height: 100vh;
+            padding: 20px 0;
+            position: fixed;
+            width: 250px;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
 
-.sidebar-item {
-    padding: 15px 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-left: 4px solid transparent;
-}
+        .sidebar-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
 
-.sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-left-color: var(--accent-color);
-}
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--accent-color);
+        }
 
-.sidebar-item.active {
-    background: rgba(59, 130, 246, 0.2);
-    border-left-color: var(--accent-color);
-}
+        .sidebar-item.active {
+            background: rgba(59, 130, 246, 0.2);
+            border-left-color: var(--accent-color);
+        }
 
-.main-content {
-    margin-left: 250px;
-    padding: 20px;
-    transition: all 0.3s ease;
-}
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
 
-.header-bar {
-    background: white;
-    padding: 15px 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .header-bar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.content-section {
-    display: none;
-}
+        .content-section {
+            display: none;
+        }
 
-.content-section.active {
-    display: block;
-}
+        .content-section.active {
+            display: block;
+        }
 
-.stats-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border-left: 4px solid var(--accent-color);
-    transition: transform 0.3s ease;
-}
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--accent-color);
+            transition: transform 0.3s ease;
+        }
 
-.stats-card:hover {
-    transform: translateY(-5px);
-}
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
 
-.loading {
-    display: none;
-    text-align: center;
-    padding: 20px;
-}
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
 
-.spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid var(--accent-color);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 10px;
-}
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
 
-/* Estilos de fuente adicionales que tenías */
-.form-label,
-.mb-0,
-.sidebar,
-.mb-4 {
-    font-weight: bold;
-}
+        /* Estilos de fuente adicionales que tenías */
+        .form-label,
+        .mb-0,
+        .sidebar,
+        .mb-4 {
+            font-weight: bold;
+        }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-/* Media Queries para Sidebar y Mobile Button */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
+        /* Media Queries para Sidebar y Mobile Button */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
 
-    .sidebar.mobile-open {
-        transform: translateX(0);
-    }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
 
-    .main-content {
-        margin-left: 0;
-    }
+            .main-content {
+                margin-left: 0;
+            }
 
-    .mobile-menu-btn {
-        display: block;
-    }
-}
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
 
-.mobile-menu-btn {
-    display: none;
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    margin-right: 15px;
-}
-</style>
+        .mobile-menu-btn {
+            display: none;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+    </style>
 </head>
 <body>
     <!-- Login Screen -->
@@ -802,7 +802,9 @@ body {
     <script>
         // Configuration
         const CONFIG = {
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx7FB-8YMbTVK_jKRjVLGoYJgONs6WwCOgvFEIyRdCQRf-VjnYSU1pnfcRr0N9Sar8c/exec', // Replace with your Apps Script URL
+            // ¡IMPORTANTE! Reemplaza esta URL con la URL de tu Web App de Google Apps Script.
+            // Asegúrate de desplegar el script y copiar la URL de la versión que tenga "Acceso: Cualquiera".
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx7FB-8YMbTVK_jKRjVLGoYJgONs6WwCOgvFEIyRdCQRf-VjnYSU1pnfcRr0N9Sar8c/exec', 
             USERS: {
                 'Joel': { password: 'Joel3312', role: 'administrator', name: 'Administrador' },
                 'Rosana': { password: 'Rosana2319', role: 'administrator', name: 'Administrador' },
@@ -889,7 +891,7 @@ body {
             // Setup user permissions
             setupUserPermissions();
             
-            // Load initial data
+            // Load initial data from Apps Script
             loadData();
         }
 
@@ -938,7 +940,7 @@ body {
             }
         }
 
-        function handleAssetRegistration(e) {
+        async function handleAssetRegistration(e) {
             e.preventDefault();
             
             const assetData = {
@@ -948,23 +950,29 @@ body {
                 type: document.getElementById('type').value,
                 description: document.getElementById('description').value,
                 quantity: parseInt(document.getElementById('quantity').value),
-                date: new Date().toISOString(),
+                date: new Date().toISOString(), // Use ISO string for consistency
                 user: currentUser.username
             };
             
-            // Simulate API call to Google Sheets
-            sendToGoogleSheets(assetData)
-                .then(() => {
+            showLoading(true);
+            try {
+                const result = await sendToGoogleSheets(assetData);
+                if (result.success) {
                     alert('Activo registrado exitosamente');
                     document.getElementById('assetForm').reset();
-                    loadData();
-                })
-                .catch(error => {
-                    alert('Error al registrar activo: ' + error.message);
-                });
+                    await loadData(); // Reload all data after successful registration
+                } else {
+                    alert('Error al registrar activo: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error de comunicación al registrar activo: ' + error.message);
+                console.error('Error al registrar activo:', error);
+            } finally {
+                showLoading(false);
+            }
         }
 
-        function handleExitRegistration(e) {
+        async function handleExitRegistration(e) {
             e.preventDefault();
             
             const exitData = {
@@ -976,13 +984,14 @@ body {
                 user: currentUser.username
             };
             
-            // Validate stock availability
+            // Validate stock availability locally before sending
+            const selectedAssetDescription = exitData.asset.split(' (Stock:')[0].trim(); // Extract just the description
             const selectedAsset = assetsData.find(asset => 
-                `${asset.category} - ${asset.description}` === exitData.asset
+                `${asset.category} - ${asset.description}` === selectedAssetDescription
             );
             
             if (!selectedAsset) {
-                alert('Activo no encontrado');
+                alert('Activo no encontrado o no seleccionable.');
                 return;
             }
             
@@ -992,131 +1001,146 @@ body {
                 return;
             }
             
-            // Simulate API call to Google Sheets
-            sendToGoogleSheets(exitData)
-                .then(() => {
+            showLoading(true);
+            try {
+                const result = await sendToGoogleSheets(exitData);
+                if (result.success) {
                     alert('Salida registrada exitosamente');
                     document.getElementById('exitForm').reset();
                     document.getElementById('exitDate').value = new Date().toISOString().split('T')[0];
-                    loadData();
-                })
-                .catch(error => {
-                    alert('Error al registrar salida: ' + error.message);
-                });
+                    await loadData(); // Reload all data after successful exit
+                } else {
+                    alert('Error al registrar salida: ' + result.message);
+                }
+            } catch (error) {
+                alert('Error de comunicación al registrar salida: ' + error.message);
+                console.error('Error al registrar salida:', error);
+            } finally {
+                showLoading(false);
+            }
         }
 
+        // Calcula el stock actual de un activo específico
         function calculateCurrentStock(asset) {
+            if (!asset || !asset.category || !asset.description) {
+                console.warn("Activo inválido para calcular stock:", asset);
+                return 0;
+            }
+            const assetIdentifier = `${asset.category} - ${asset.description}`;
             const exits = exitsData.filter(exit => 
-                exit.asset === `${asset.category} - ${asset.description}`
+                exit.asset === assetIdentifier
             );
-            const totalExits = exits.reduce((sum, exit) => sum + exit.quantity, 0);
-            return asset.quantity - totalExits;
+            const totalExits = exits.reduce((sum, exit) => sum + (exit.quantity || 0), 0);
+            return (asset.quantity || 0) - totalExits;
         }
 
+        // Carga las opciones de activos en el selector de salida
         function loadAssetOptions() {
             const select = document.getElementById('assetSelect');
-            select.innerHTML = '<option value="">Seleccionar activo</option>';
+            select.innerHTML = '<option value="">Seleccionar activo</option>'; // Limpiar y añadir opción por defecto
             
+            // Asegúrate de que assetsData y exitsData estén cargados
+            if (assetsData.length === 0) {
+                 // Si assetsData no está cargado, no hay nada que listar.
+                 // Podrías cargarla aquí si no se hace en otro lugar antes de llamar a esta función.
+                 // Por ahora, asumimos que loadData() ya se ha ejecutado.
+                 return;
+            }
+
             assetsData.forEach(asset => {
                 const currentStock = calculateCurrentStock(asset);
-                if (currentStock > 0) {
+                if (currentStock > 0) { // Solo muestra activos con stock disponible
                     const option = document.createElement('option');
-                    option.value = `${asset.category} - ${asset.description}`;
+                    // Usamos solo la categoría y descripción como valor, y el stock para mostrar al usuario.
+                    option.value = `${asset.category} - ${asset.description}`; 
                     option.textContent = `${asset.category} - ${asset.description} (Stock: ${currentStock})`;
                     select.appendChild(option);
                 }
             });
         }
 
+        // Actualiza el campo de stock disponible cuando se selecciona un activo
         function updateAvailableStock() {
-            const selectedAsset = document.getElementById('assetSelect').value;
+            const selectedValue = document.getElementById('assetSelect').value;
             const stockField = document.getElementById('availableStock');
             
-            if (selectedAsset) {
+            if (selectedValue) {
+                // Parseamos el valor para obtener solo la descripción del activo
+                const selectedAssetDescription = selectedValue.split(' (Stock:')[0].trim();
                 const asset = assetsData.find(a => 
-                    `${a.category} - ${a.description}` === selectedAsset
+                    `${a.category} - ${a.description}` === selectedAssetDescription
                 );
                 if (asset) {
                     const currentStock = calculateCurrentStock(asset);
                     stockField.value = currentStock;
+                } else {
+                    stockField.value = 'N/A';
                 }
             } else {
                 stockField.value = '';
             }
         }
 
-        function loadData() {
-            // Simulate loading data from Google Sheets
-            // In real implementation, this would call your Apps Script
-            
-            // Mock data for demonstration
-            assetsData = [
-                {
-                    id: 1,
-                    category: 'Mobiliario',
-                    area: 'Administración',
-                    type: 'Madera',
-                    description: 'Escritorio ejecutivo',
-                    quantity: 5,
-                    date: '2024-01-15',
-                    user: 'admin'
-                },
-                {
-                    id: 2,
-                    category: 'Tecnología',
-                    area: 'Administración',
-                    type: 'Electrónico',
-                    description: 'Computadora de escritorio',
-                    quantity: 10,
-                    date: '2024-01-20',
-                    user: 'admin'
-                },
-                {
-                    id: 3,
-                    category: 'Electrodoméstico',
-                    area: 'Cocina',
-                    type: 'Metal',
-                    description: 'Refrigerador industrial',
-                    quantity: 2,
-                    date: '2024-02-01',
-                    user: 'operator'
+        async function loadData() {
+            showLoading(true); // Mostrar indicador de carga
+            try {
+                // Obtener datos de activos
+                const assetsResponse = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getAssets');
+                const assetsResult = await assetsResponse.json();
+                if (assetsResult.success) {
+                    assetsData = assetsResult.data || [];
+                } else {
+                    console.error('Error al obtener activos:', assetsResult.message);
+                    assetsData = []; // Clear data on error
                 }
-            ];
-            
-            exitsData = [
-                {
-                    id: 1,
-                    date: '2024-02-15',
-                    asset: 'Mobiliario - Escritorio ejecutivo',
-                    quantity: 1,
-                    reason: 'Traslado a nueva oficina',
-                    user: 'admin'
-                },
-                {
-                    id: 2,
-                    date: '2024-02-20',
-                    asset: 'Tecnología - Computadora de escritorio',
-                    quantity: 2,
-                    reason: 'Reemplazo por equipos nuevos',
-                    user: 'operator'
+
+                // Obtener datos de salidas
+                const exitsResponse = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getExits');
+                const exitsResult = await exitsResponse.json();
+                if (exitsResult.success) {
+                    exitsData = exitsResult.data || [];
+                } else {
+                    console.error('Error al obtener salidas:', exitsResult.message);
+                    exitsData = []; // Clear data on error
                 }
-            ];
-            
-            updateDashboard();
+                
+                // Actualizar UI con los nuevos datos
+                updateDashboard();
+                loadAssetsTable();
+                loadAssetOptions(); // Asegurarse de que las opciones se carguen después de tener los assetsData
+                
+            } catch (error) {
+                console.error('Error de comunicación al cargar datos:', error);
+                alert('Error al cargar datos del servidor. Por favor, verifica tu conexión o la URL del Apps Script: ' + error.message);
+                // Si hay un error, limpiar los datos para evitar mostrar información incorrecta
+                assetsData = [];
+                exitsData = [];
+                updateDashboard();
+                loadAssetsTable();
+                loadAssetOptions();
+            } finally {
+                showLoading(false); // Ocultar indicador de carga
+            }
         }
+
 
         function updateDashboard() {
             // Calculate statistics
-            const totalAssets = assetsData.length;
-            const totalIncome = assetsData.reduce((sum, asset) => sum + asset.quantity, 0);
-            const totalExits = exitsData.reduce((sum, exit) => sum + exit.quantity, 0);
-            const currentStock = totalIncome - totalExits;
+            const totalAssetsCount = assetsData.length; // Cantidad de tipos de activos únicos
+            const totalIncomeQuantity = assetsData.reduce((sum, asset) => sum + (asset.quantity || 0), 0);
+            const totalExitsQuantity = exitsData.reduce((sum, exit) => sum + (exit.quantity || 0), 0);
             
+            // Calculate current stock based on actual assets and exits
+            let calculatedCurrentStock = 0;
+            assetsData.forEach(asset => {
+                calculatedCurrentStock += calculateCurrentStock(asset);
+            });
+
             // Update dashboard cards
-            document.getElementById('totalAssets').textContent = totalAssets;
-            document.getElementById('totalIncome').textContent = totalIncome;
-            document.getElementById('totalExits').textContent = totalExits;
-            document.getElementById('currentStock').textContent = currentStock;
+            document.getElementById('totalAssets').textContent = totalAssetsCount;
+            document.getElementById('totalIncome').textContent = totalIncomeQuantity;
+            document.getElementById('totalExits').textContent = totalExitsQuantity;
+            document.getElementById('currentStock').textContent = calculatedCurrentStock;
             
             // Update recent activity
             updateRecentActivity();
@@ -1125,9 +1149,13 @@ body {
 
         function updateRecentActivity() {
             const container = document.getElementById('recentActivity');
-            const recentAssets = assetsData.slice(-3).reverse();
+            // Ordenar activos por fecha de forma descendente y tomar los últimos 3
+            const recentAssets = [...assetsData].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
             
             container.innerHTML = '';
+            if (recentAssets.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay registros recientes.</p>';
+            }
             recentAssets.forEach(asset => {
                 const item = document.createElement('div');
                 item.className = 'border-start border-3 border-success ps-3 mb-3';
@@ -1148,7 +1176,7 @@ body {
                 if (!categoryStats[asset.category]) {
                     categoryStats[asset.category] = 0;
                 }
-                categoryStats[asset.category] += asset.quantity;
+                categoryStats[asset.category] += asset.quantity || 0;
             });
             
             const sortedCategories = Object.entries(categoryStats)
@@ -1156,6 +1184,9 @@ body {
                 .slice(0, 5);
             
             container.innerHTML = '';
+            if (sortedCategories.length === 0) {
+                container.innerHTML = '<p class="text-muted">No hay categorías para mostrar.</p>';
+            }
             sortedCategories.forEach(([category, count]) => {
                 const item = document.createElement('div');
                 item.className = 'd-flex justify-content-between align-items-center mb-2';
@@ -1172,42 +1203,52 @@ body {
             const loading = document.getElementById('tableLoading');
             
             loading.style.display = 'block';
-            tableBody.innerHTML = '';
+            tableBody.innerHTML = ''; // Clear table before loading
+
+            // Group assets and calculate totals
+            const assetSummary = {};
             
-            setTimeout(() => {
-                // Group assets and calculate totals
-                const assetSummary = {};
-                
-                assetsData.forEach(asset => {
+            assetsData.forEach(asset => {
+                // Ensure asset.category, asset.area, asset.type, asset.description are defined
+                const category = asset.category || 'N/A';
+                const area = asset.area || 'N/A';
+                const type = asset.type || 'N/A';
+                const description = asset.description || 'N/A';
+
+                const key = `${category}-${area}-${type}-${description}`;
+                if (!assetSummary[key]) {
+                    assetSummary[key] = {
+                        category: category,
+                        area: area,
+                        type: type,
+                        description: description,
+                        totalIncome: 0,
+                        totalExits: 0
+                    };
+                }
+                assetSummary[key].totalIncome += (asset.quantity || 0);
+            });
+            
+            // Calculate exits for each asset
+            exitsData.forEach(exit => {
+                // Find the original asset that matches this exit
+                const asset = assetsData.find(a => 
+                    `${a.category} - ${a.description}` === exit.asset
+                );
+                if (asset) {
                     const key = `${asset.category}-${asset.area}-${asset.type}-${asset.description}`;
-                    if (!assetSummary[key]) {
-                        assetSummary[key] = {
-                            category: asset.category,
-                            area: asset.area,
-                            type: asset.type,
-                            description: asset.description,
-                            totalIncome: 0,
-                            totalExits: 0
-                        };
+                    if (assetSummary[key]) {
+                        assetSummary[key].totalExits += (exit.quantity || 0);
                     }
-                    assetSummary[key].totalIncome += asset.quantity;
-                });
-                
-                // Calculate exits for each asset
-                exitsData.forEach(exit => {
-                    const asset = assetsData.find(a => 
-                        `${a.category} - ${a.description}` === exit.asset
-                    );
-                    if (asset) {
-                        const key = `${asset.category}-${asset.area}-${asset.type}-${asset.description}`;
-                        if (assetSummary[key]) {
-                            assetSummary[key].totalExits += exit.quantity;
-                        }
-                    }
-                });
-                
-                // Populate table
-                Object.values(assetSummary).forEach(asset => {
+                }
+            });
+            
+            // Populate table
+            const assetsToDisplay = Object.values(assetSummary);
+            if (assetsToDisplay.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">No hay activos registrados.</td></tr>`;
+            } else {
+                assetsToDisplay.forEach(asset => {
                     const finalStock = asset.totalIncome - asset.totalExits;
                     const status = finalStock > 0 ? 'Disponible' : 'Agotado';
                     const statusClass = finalStock > 0 ? 'success' : 'danger';
@@ -1225,65 +1266,39 @@ body {
                     `;
                     tableBody.appendChild(row);
                 });
+            }
+            
+            loading.style.display = 'none';
+        }
+
+        async function sendToGoogleSheets(data) {
+            console.log('Sending to Google Sheets:', data); // Confirm what's being sent
+            try {
+                const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
                 
-                loading.style.display = 'none';
-            }, 1000);
-        }
-
-        function sendToGoogleSheets(data) {
-            // This would be the actual implementation to send data to Google Sheets
-            // For now, we'll simulate the API call
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    console.log('Sending to Google Sheets:', data);
-                    
-                    if (data.action === 'addAsset') {
-                        assetsData.push({
-                            id: assetsData.length + 1,
-                            category: data.category,
-                            area: data.area,
-                            type: data.type,
-                            description: data.description,
-                            quantity: data.quantity,
-                            date: data.date,
-                            user: data.user
-                        });
-                    } else if (data.action === 'addExit') {
-                        exitsData.push({
-                            id: exitsData.length + 1,
-                            date: data.date,
-                            asset: data.asset,
-                            quantity: data.quantity,
-                            reason: data.reason,
-                            user: data.user
-                        });
-                    }
-                    
-                    resolve();
-                }, 500);
-            });
-            
-            // Real implementation would be:
-            return fetch(CONFIG.APPS_SCRIPT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.error) {
-                    throw new Error(result.error);
+                if (!response.ok) {
+                    // Si la respuesta no es OK (ej. 404, 500), lanzamos un error
+                    const errorText = await response.text();
+                    throw new Error(`Error de red o servidor (${response.status}): ${errorText}`);
                 }
-                return result;
-            });
-            
+
+                const result = await response.json();
+                return result; // Tu Apps Script ya devuelve { success: true/false, message: ..., data: ... }
+                
+            } catch (error) {
+                console.error('Error en sendToGoogleSheets:', error);
+                throw error; // Re-lanzar el error para que sea manejado por el llamador
+            }
         }
 
-        function refreshData() {
-            loadData();
-            loadAssetsTable();
+        async function refreshData() {
+            await loadData();
             alert('Datos actualizados');
         }
 
@@ -1308,7 +1323,7 @@ body {
                         'Stock Final': 0
                     };
                 }
-                assetSummary[key]['Cantidad Ingresada'] += asset.quantity;
+                assetSummary[key]['Cantidad Ingresada'] += (asset.quantity || 0);
             });
             
             // Calculate exits
@@ -1319,7 +1334,7 @@ body {
                 if (asset) {
                     const key = `${asset.category}-${asset.area}-${asset.type}-${asset.description}`;
                     if (assetSummary[key]) {
-                        assetSummary[key]['Cantidad Salida'] += exit.quantity;
+                        assetSummary[key]['Cantidad Salida'] += (exit.quantity || 0);
                     }
                 }
             });
@@ -1343,6 +1358,15 @@ body {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('mobile-open');
         }
+
+        // Función para mostrar/ocultar el spinner de carga
+        function showLoading(show) {
+            const loadingElement = document.getElementById('tableLoading');
+            if (loadingElement) {
+                loadingElement.style.display = show ? 'block' : 'none';
+            }
+        }
+
 
         function logout() {
             if (confirm('¿Está seguro que desea cerrar sesión?')) {
