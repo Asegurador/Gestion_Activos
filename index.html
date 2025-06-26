@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de gestión de activos y salidas para inventario de mobiliario, tecnología y electrodomésticos. Controla entradas y salidas de forma eficiente.">
+    <meta name="keywords" content="gestión de activos, control de inventario, mobiliario, tecnología, electrodomésticos, sistema de inventario, activos empresariales, registro de salidas">
+    <meta name="author" content="AuraSys Team">
+    <meta name="robots" content="index, follow">
+    <title>Sistema AuraSys</title>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@"> <meta name="twitter:creator" content="@tu_usuario_twitter"> <meta name="twitter:url" content="https://asegurador.github.io/Gestion_Activos/index.html">
+    <meta name="twitter:title" content="Gestión de Activos | Control de Inventario Simplificado">
+    <link rel="icon" type="image/png" href="https://w7.pngwing.com/pngs/712/289/png-transparent-no-service-payment-fixed-asset-others-miscellaneous-cdr-angle.png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+ @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+/* Variables existentes - Mantienen su propósito para el resto de tu aplicación */
+:root {
+    --primary-color: #1e293b;
+    --secondary-color: #334155;
+    --accent-color: #3b82f6;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --light-bg: #f8fafc;
+    --border-color: #e2e8f0;
+}
+
+/* Reseteo global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* La fuente Montserrat se aplica aquí para el login y potencialmente para toda la app si no se sobrescribe */
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Estilos base del body - Mantienen tu fondo gradiente para el resto de la app si el login no está activo */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Mantiene tu fuente original para el resto de la app */
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: var(--primary-color);
+    line-height: 1.6;
+}
+
+/* --- Estilos del Nuevo Login "AuraSys" --- */
+
+/* Contenedor principal del login */
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Asegura que ocupe al menos el 100% del alto de la ventana */
+    width: 100%;
+    background: url('https://codingstella.com/wp-content/uploads/2024/01/download-5.jpeg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    animation: animateBg 5s linear infinite;
+    /* Asegura que el wrapper del login sobrescriba el fondo del body cuando el login está visible */
+    position: absolute; /* Para que ocupe toda la pantalla y no afecte el layout del body */
+    top: 0;
+    left: 0;
+    z-index: 999; /* Asegura que esté por encima de otros elementos si existen */
+}
+
+@keyframes animateBg {
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* Caja del formulario de login */
+.login-box {
+    position: relative;
+    width: 400px;
+    height: 450px;
+    background: transparent;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, .5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(15px);
+    padding: 20px; /* Añade un poco de padding para evitar que el contenido toque los bordes */
+}
+
+.login-box h2 {
+    font-size: 2.2em; /* Ligeramente más grande para más impacto */
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px; /* Espacio debajo del título */
+}
+
+/* Caja de entrada de texto */
+.input-box {
+    position: relative;
+    width: 100%; /* Ocupa el 100% del ancho de .login-box */
+    height: 50px;
+    margin-bottom: 30px; /* Espacio entre las cajas de entrada */
+    border-bottom: 2px solid #fff; /* Más prominente */
+}
+
+.input-box label {
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    font-size: 1.1em; /* Ligeramente más grande */
+    color: #fff;
+    pointer-events: none;
+    transition: .5s;
+}
+
+.input-box input:focus ~ label,
+.input-box input:valid ~ label {
+    top: -5px;
+    font-size: 0.9em; /* Más pequeño al enfocar/validar */
+    color: #fff; /* Asegura que el color siga blanco */
+}
+
+.input-box input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1.1em; /* Más grande para mejor legibilidad */
+    color: #fff;
+    padding: 0 35px 0 5px;
+}
+
+.input-box .icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    color: #fff;
+    transform: translateY(-50%);
+    font-size: 1.2em; /* Iconos un poco más grandes */
+}
+
+/* Botón de login */
+.wrapper button {
+    width: 100%;
+    height: 45px; /* Ligeramente más alto */
+    background-color: #fff;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 1.1em; /* Más grande */
+    color: #000;
+    font-weight: 600; /* Más negrita */
+    margin-top: 20px; /* Espacio superior */
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.wrapper button:hover {
+    background-color: #f0f0f0; /* Un ligero cambio al pasar el ratón */
+    transform: translateY(-2px); /* Pequeño efecto de elevación */
+}
+
+/* Enlace de registro/olvidaste contraseña */
+.register-link {
+    font-size: .9em;
+    color: #fff;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.register-link p a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link p a:hover {
+    text-decoration: underline;
+}
+
+/* Media Queries para Responsive Design del Login */
+@media (max-width: 500px) {
+    .login-box {
+        width: 90%; /* Ajusta el ancho en pantallas pequeñas */
+        height: auto; /* Altura automática para adaptarse al contenido */
+        border: none;
+        border-radius: 0;
+        padding: 20px; /* Ajusta el padding para pantallas pequeñas */
+    }
+    .input-box {
+        width: 100%; /* Asegura que la caja de entrada ocupe todo el ancho disponible */
+    }
+    .wrapper {
+        background-position: left center; /* Ajusta la posición de la imagen de fondo */
+    }
+}
+
+/* --- Tus estilos originales que no deben ser afectados --- */
+
+/* OCULTA EL CONTENEDOR DE LOGIN ANTIGUO */
+#loginScreen.login-container {
+    display: none; /* Asegura que tu login antiguo no se muestre */
+}
+
+/* Clases de utilidad y componentes (glass-card, nav-item, buttons, etc.) */
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+    margin: 0 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+.nav-item.active {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-modern {
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-modern:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.btn-modern:hover:before {
+    left: 100%;
+}
+
+.btn-primary-modern {
+    background: linear-gradient(135deg, var(--accent-color), #2563eb);
+    color: white;
+}
+
+.btn-success-modern {
+    background: linear-gradient(135deg, var(--success-color), #059669);
+    color: white;
+}
+
+.btn-danger-modern {
+    background: linear-gradient(135deg, var(--danger-color), #dc2626);
+    color: white;
+}
+
+.form-control {
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+    background: white;
+}
+
+.table-container {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.table-modern {
+    margin: 0;
+    background: white;
+}
+
+.table-modern th {
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    padding: 16px;
+    border: none;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table-modern td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.table-modern tr:hover {
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.badge-custom {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge-primary {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-color);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Old login-container and login-card, will be hidden */
+/* You had this in your original CSS, I've just added `display: none;` above */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar y Main Content */
+.sidebar {
+    background: var(--primary-color);
+    color: white;
+    height: 100vh;
+    padding: 20px 0;
+    position: fixed;
+    width: 250px;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.sidebar-item {
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-left-color: var(--accent-color);
+}
+
+.sidebar-item.active {
+    background: rgba(59, 130, 246, 0.2);
+    border-left-color: var(--accent-color);
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.header-bar {
+    background: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content-section {
+    display: none;
+}
+
+.content-section.active {
+    display: block;
+}
+
+.stats-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid var(--accent-color);
+    transition: transform 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--accent-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+/* Estilos de fuente adicionales que tenías */
+.form-label,
+.mb-0,
+.sidebar,
+.mb-4 {
+    font-weight: bold;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Media Queries para Sidebar y Mobile Button */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+    }
+}
+
+.mobile-menu-btn {
+    display: none;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    margin-right: 15px;
+}
+</style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="wrapper">
+        <div class="login-box">
+            <form id="loginForm" action="">
+                <h2>AuraSys</h2>
+    
+                <div class="input-box">
+                    <span class="icon">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input type="text" id="username" required>
+                    <label>Usuario</label>
+                </div>
+    
+                <div class="input-box">
+                    <span class="icon">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <input type="password" id="password" required>
+                    <label>Contraseña</label>
+                </div>
+    
+                <button type="submit">Login</button>
+    
+                <div class="register-link">
+                    <p>¿Olvidaste tu contraseña? <a href="https://wa.me/573133118664?text=JOEL%20SE%20ME%20OLVIDO%20LA%20CONTRASEÑA%20AYUDAME">Click Aquí</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="text-center p-3 border-bottom border-secondary">
+                <i class="fas fa-building fa-2x mb-2"></i>
+                <h5>Gestión de Activos</h5>
+                <small id="userDisplay" class="text-light"></small>
+            </div>
+            <div class="mt-3">
+                <div class="sidebar-item active" data-section="dashboard">
+                    <i class="fa fa-tachometer"> </i> Dashboard
+                </div>
+                <div class="sidebar-item" data-section="register">
+                    <i class="fas fa-plus-circle me-2"></i>Registrar Activos
+                </div>
+                <div class="sidebar-item" data-section="exit">
+                    <i class="fas fa-minus-circle me-2"></i>Registrar Salidas
+                </div>
+                <div class="sidebar-item" data-section="view">
+                    <i class="fas fa-table me-2"></i>Ver Activos
+                </div>
+                <div class="sidebar-item" data-section="reports">
+                    <i class="fas fa-chart-bar me-2"></i>Reportes
+                </div>
+                <div class="sidebar-item mt-auto" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header-bar">
+                <div class="d-flex align-items-center">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h4 class="mb-0" id="sectionTitle">Dashboard</h4>
+                </div>
+                <div>
+                    <span class="text-muted">Bienvenido, </span>
+                    <strong id="headerUser"></strong>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Total Activos</h6>
+                                    <h3 class="mb-0" id="totalAssets">0</h3>
+                                </div>
+                                <i class="fas fa-boxes fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Ingresos</h6>
+                                    <h3 class="mb-0 text-success" id="totalIncome">0</h3>
+                                </div>
+                                <i class="fas fa-arrow-up fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Salidas</h6>
+                                    <h3 class="mb-0 text-danger" id="totalExits">0</h3>
+                                </div>
+                                <i class="fas fa-arrow-down fa-2x text-danger"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted mb-1">Stock Activos</h6>
+                                    <h3 class="mb-0 text-info" id="currentStock">0</h3>
+                                </div>
+                                <i class="fas fa-warehouse fa-2x text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-card p-4">
+                    <h5 class="mb-3">Resumen de Actividad</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Últimos Registros</h6>
+                            <div id="recentActivity" class="mt-3">
+                                <!-- Activity items will be populated here -->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Categorías Principales</h6>
+                            <div id="topCategories" class="mt-3">
+                                <!-- Category items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Assets Section -->
+            <div id="register" class="content-section">
+                <div class="glass-card p-4">
+                    <h5 class="mb-4">Registrar Nuevo Activo</h5>
+                    <form id="assetForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Categoría</label>
+                                <select class="form-control" id="category" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="Electrodoméstico">Electrodoméstico</option>
+                                    <option value="Mobiliario">Mobiliario</option>
+                                    <option value="Equipo de Oficina">Equipo de Oficina</option>
+                                    <option value="Herramientas">Herramientas</option>
+                                    <option value="Tecnología">Tecnología</option>
+                                    <option value="Vehículos">Vehículos</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Área</label>
+                                <select class="form-control" id="area" required>
+                                    <option value="">Seleccionar área</option>
+                                    <option value="Cocina">Cocina</option>
+                                    <option value="Administración">Administración</option>
+                                    <option value="Almacén">Almacén</option>
+                                    <option value="Producción">Producción</option>
+                                    <option value="Mantenimiento">Mantenimiento</option>
+                                    <option value="Ventas">Ventas</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo</label>
+                                <select class="form-control" id="type" required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="Metal">Metal</option>
+                                    <option value="Vidrio">Vidrio</option>
+                                    <option value="Madera">Madera</option>
+                                    <option value="Plástico">Plástico</option>
+                                    <option value="Electrónico">Electrónico</option>
+                                    <option value="Textil">Textil</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cantidad Total</label>
+                                <input type="number" class="form-control" id="quantity" min="1" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea class="form-control" id="description" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success-modern btn-modern">
+                            <i class="fas fa-save me-2"></i>Registrar Activo
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Register Exits Section -->
+            <div id="exit" class="content-section">
+                <div class="glass-card p-4">
+                    <h5 class="mb-4">Registrar Salida de Activo</h5>
+                    <form id="exitForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="exitDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Activo</label>
+                                <select class="form-control" id="assetSelect" required>
+                                    <option value="">Seleccionar activo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Cantidad a Salir</label>
+                                <input type="number" class="form-control" id="exitQuantity" min="1" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Stock Disponible</label>
+                                <input type="text" class="form-control" id="availableStock" readonly>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Motivo de Salida</label>
+                                <textarea class="form-control" id="exitReason" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-danger-modern btn-modern">
+                            <i class="fas fa-minus-circle me-2"></i>Registrar Salida
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- View Assets Section -->
+            <div id="view" class="content-section">
+                <div class="glass-card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">Lista de Activos</h5>
+                        <div>
+                            <button class="btn btn-primary-modern btn-modern me-2" onclick="refreshData()">
+                                <i class="fas fa-sync-alt me-2"></i>Actualizar
+                            </button>
+                            <button class="btn btn-success-modern btn-modern" onclick="exportToExcel()">
+                                <i class="fas fa-file-excel me-2"></i>Exportar Excel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="loading" id="tableLoading">
+                        <div class="spinner"></div>
+                        <p>Cargando datos...</p>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Categoría</th>
+                                    <th>Área</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Ingresado</th>
+                                    <th>Salidas</th>
+                                    <th>Stock Final</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetsTableBody">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reports" class="content-section">
+                <div class="glass-card p-4">
+                    <h5 class="mb-4">Reportes y Análisis</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6>Activos por Categoría</h6>
+                            <div id="categoryChart" class="mt-3">
+                                <!-- Chart will be populated here -->
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6>Movimientos por Área</h6>
+                            <div id="areaChart" class="mt-3">
+                                <!-- Chart will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx7FB-8YMbTVK_jKRjVLGoYJgONs6WwCOgvFEIyRdCQRf-VjnYSU1pnfcRr0N9Sar8c/exec', // Replace with your Apps Script URL
+            USERS: {
+                'Joel': { password: 'Joel3312', role: 'administrator', name: 'Administrador' },
+                'Rosana': { password: 'Rosana2319', role: 'administrator', name: 'Administrador' },
+                'Miguel': { password: 'Miguel0106', role: 'readonly', name: 'Visualizacion' },
+                '0678': { password: '0678', role: 'readonly', name: 'Visualizacion' },
+                'Operador': { password: 'Operador', role: 'operator', name: 'Operador' }
+            }
+        };
+
+        // Global variables
+        let currentUser = null;
+        let assetsData = [];
+        let exitsData = [];
+
+        // Initialize application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Set current date for exit form
+            document.getElementById('exitDate').value = new Date().toISOString().split('T')[0];
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Check if user is already logged in
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainApp();
+            }
+        }
+
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Asset registration form
+            document.getElementById('assetForm').addEventListener('submit', handleAssetRegistration);
+            
+            // Exit registration form
+            document.getElementById('exitForm').addEventListener('submit', handleExitRegistration);
+            
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-item[data-section]').forEach(item => {
+                item.addEventListener('click', function() {
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                });
+            });
+            
+            // Asset selection change
+            document.getElementById('assetSelect').addEventListener('change', updateAvailableStock);
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (CONFIG.USERS[username] && CONFIG.USERS[username].password === password) {
+                currentUser = {
+                    username: username,
+                    ...CONFIG.USERS[username]
+                };
+                
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showMainApp();
+            } else {
+                alert('Usuario o contraseña incorrectos');
+            }
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            
+            // Display user info
+            document.getElementById('userDisplay').textContent = currentUser.name;
+            document.getElementById('headerUser').textContent = currentUser.username;
+            
+            // Setup user permissions
+            setupUserPermissions();
+            
+            // Load initial data
+            loadData();
+        }
+
+        function setupUserPermissions() {
+            const registerSection = document.querySelector('.sidebar-item[data-section="register"]');
+            const exitSection = document.querySelector('.sidebar-item[data-section="exit"]');
+            
+            if (currentUser.role === 'readonly') {
+                registerSection.style.display = 'none';
+                exitSection.style.display = 'none';
+            }
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+            
+            // Update section title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'register': 'Registrar Activos',
+                'exit': 'Registrar Salidas',
+                'view': 'Ver Activos',
+                'reports': 'Reportes'
+            };
+            document.getElementById('sectionTitle').textContent = titles[sectionName];
+            
+            // Load section-specific data
+            if (sectionName === 'view') {
+                loadAssetsTable();
+            } else if (sectionName === 'exit') {
+                loadAssetOptions();
+            } else if (sectionName === 'dashboard') {
+                updateDashboard();
+            }
+        }
+
+        function handleAssetRegistration(e) {
+            e.preventDefault();
+            
+            const assetData = {
+                action: 'addAsset',
+                category: document.getElementById('category').value,
+                area: document.getElementById('area').value,
+                type: document.getElementById('type').value,
+                description: document.getElementById('description').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                date: new Date().toISOString(),
+                user: currentUser.username
+            };
+            
+            // Simulate API call to Google Sheets
+            sendToGoogleSheets(assetData)
+                .then(() => {
+                    alert('Activo registrado exitosamente');
+                    document.getElementById('assetForm').reset();
+                    loadData();
+                })
+                .catch(error => {
+                    alert('Error al registrar activo: ' + error.message);
+                });
+        }
+
+        function handleExitRegistration(e) {
+            e.preventDefault();
+            
+            const exitData = {
+                action: 'addExit',
+                date: document.getElementById('exitDate').value,
+                asset: document.getElementById('assetSelect').value,
+                quantity: parseInt(document.getElementById('exitQuantity').value),
+                reason: document.getElementById('exitReason').value,
+                user: currentUser.username
+            };
+            
+            // Validate stock availability
+            const selectedAsset = assetsData.find(asset => 
+                `${asset.category} - ${asset.description}` === exitData.asset
+            );
+            
+            if (!selectedAsset) {
+                alert('Activo no encontrado');
+                return;
+            }
+            
+            const currentStock = calculateCurrentStock(selectedAsset);
+            if (exitData.quantity > currentStock) {
+                alert(`Stock insuficiente. Stock disponible: ${currentStock}`);
+                return;
+            }
+            
+            // Simulate API call to Google Sheets
+            sendToGoogleSheets(exitData)
+                .then(() => {
+                    alert('Salida registrada exitosamente');
+                    document.getElementById('exitForm').reset();
+                    document.getElementById('exitDate').value = new Date().toISOString().split('T')[0];
+                    loadData();
+                })
+                .catch(error => {
+                    alert('Error al registrar salida: ' + error.message);
+                });
+        }
+
+        function calculateCurrentStock(asset) {
+            const exits = exitsData.filter(exit => 
+                exit.asset === `${asset.category} - ${asset.description}`
+            );
+            const totalExits = exits.reduce((sum, exit) => sum + exit.quantity, 0);
+            return asset.quantity - totalExits;
+        }
+
+        function loadAssetOptions() {
+            const select = document.getElementById('assetSelect');
+            select.innerHTML = '<option value="">Seleccionar activo</option>';
+            
+            assetsData.forEach(asset => {
+                const currentStock = calculateCurrentStock(asset);
+                if (currentStock > 0) {
+                    const option = document.createElement('option');
+                    option.value = `${asset.category} - ${asset.description}`;
+                    option.textContent = `${asset.category} - ${asset.description} (Stock: ${currentStock})`;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function updateAvailableStock() {
+            const selectedAsset = document.getElementById('assetSelect').value;
+            const stockField = document.getElementById('availableStock');
+            
+            if (selectedAsset) {
+                const asset = assetsData.find(a => 
+                    `${a.category} - ${a.description}` === selectedAsset
+                );
+                if (asset) {
+                    const currentStock = calculateCurrentStock(asset);
+                    stockField.value = currentStock;
+                }
+            } else {
+                stockField.value = '';
+            }
+        }
+
+        function loadData() {
+            // Simulate loading data from Google Sheets
+            // In real implementation, this would call your Apps Script
+            
+            // Mock data for demonstration
+            assetsData = [
+                {
+                    id: 1,
+                    category: 'Mobiliario',
+                    area: 'Administración',
+                    type: 'Madera',
+                    description: 'Escritorio ejecutivo',
+                    quantity: 5,
+                    date: '2024-01-15',
+                    user: 'admin'
+                },
+                {
+                    id: 2,
+                    category: 'Tecnología',
+                    area: 'Administración',
+                    type: 'Electrónico',
+                    description: 'Computadora de escritorio',
+                    quantity: 10,
+                    date: '2024-01-20',
+                    user: 'admin'
+                },
+                {
+                    id: 3,
+                    category: 'Electrodoméstico',
+                    area: 'Cocina',
+                    type: 'Metal',
+                    description: 'Refrigerador industrial',
+                    quantity: 2,
+                    date: '2024-02-01',
+                    user: 'operator'
+                }
+            ];
+            
+            exitsData = [
+                {
+                    id: 1,
+                    date: '2024-02-15',
+                    asset: 'Mobiliario - Escritorio ejecutivo',
+                    quantity: 1,
+                    reason: 'Traslado a nueva oficina',
+                    user: 'admin'
+                },
+                {
+                    id: 2,
+                    date: '2024-02-20',
+                    asset: 'Tecnología - Computadora de escritorio',
+                    quantity: 2,
+                    reason: 'Reemplazo por equipos nuevos',
+                    user: 'operator'
+                }
+            ];
+            
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            // Calculate statistics
+            const totalAssets = assetsData.length;
+            const totalIncome = assetsData.reduce((sum, asset) => sum + asset.quantity, 0);
+            const totalExits = exitsData.reduce((sum, exit) => sum + exit.quantity, 0);
+            const currentStock = totalIncome - totalExits;
+            
+            // Update dashboard cards
+            document.getElementById('totalAssets').textContent = totalAssets;
+            document.getElementById('totalIncome').textContent = totalIncome;
+            document.getElementById('totalExits').textContent = totalExits;
+            document.getElementById('currentStock').textContent = currentStock;
+            
+            // Update recent activity
+            updateRecentActivity();
+            updateTopCategories();
+        }
+
+        function updateRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            const recentAssets = assetsData.slice(-3).reverse();
+            
+            container.innerHTML = '';
+            recentAssets.forEach(asset => {
+                const item = document.createElement('div');
+                item.className = 'border-start border-3 border-success ps-3 mb-3';
+                item.innerHTML = `
+                    <div class="fw-bold">${asset.description}</div>
+                    <small class="text-muted">${asset.category} - ${new Date(asset.date).toLocaleDateString()}</small>
+                    <div><span class="badge badge-success">+${asset.quantity}</span></div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateTopCategories() {
+            const container = document.getElementById('topCategories');
+            const categoryStats = {};
+            
+            assetsData.forEach(asset => {
+                if (!categoryStats[asset.category]) {
+                    categoryStats[asset.category] = 0;
+                }
+                categoryStats[asset.category] += asset.quantity;
+            });
+            
+            const sortedCategories = Object.entries(categoryStats)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5);
+            
+            container.innerHTML = '';
+            sortedCategories.forEach(([category, count]) => {
+                const item = document.createElement('div');
+                item.className = 'd-flex justify-content-between align-items-center mb-2';
+                item.innerHTML = `
+                    <span>${category}</span>
+                    <span class="badge badge-primary">${count}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function loadAssetsTable() {
+            const tableBody = document.getElementById('assetsTableBody');
+            const loading = document.getElementById('tableLoading');
+            
+            loading.style.display = 'block';
+            tableBody.innerHTML = '';
+            
+            setTimeout(() => {
+                // Group assets and calculate totals
+                const assetSummary = {};
+                
+                assetsData.forEach(asset => {
+                    const key = `${asset.category}-${asset.area}-${asset.type}-${asset.description}`;
+                    if (!assetSummary[key]) {
+                        assetSummary[key] = {
+                            category: asset.category,
+                            area: asset.area,
+                            type: asset.type,
+                            description: asset.description,
+                            totalIncome: 0,
+                            totalExits: 0
+                        };
+                    }
+                    assetSummary[key].totalIncome += asset.quantity;
+                });
+                
+                // Calculate exits for each asset
+                exitsData.forEach(exit => {
+                    const asset = assetsData.find(a => 
+                        `${a.category} - ${a.description}` === exit.asset
+                    );
+                    if (asset) {
+                        const key = `${asset.category}-${asset.area}-${asset.type}-${asset.description}`;
+                        if (assetSummary[key]) {
+                            assetSummary[key].totalExits += exit.quantity;
+                        }
+                    }
+                });
+                
+                // Populate table
+                Object.values(assetSummary).forEach(asset => {
+                    const finalStock = asset.totalIncome - asset.totalExits;
+                    const status = finalStock > 0 ? 'Disponible' : 'Agotado';
+                    const statusClass = finalStock > 0 ? 'success' : 'danger';
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${asset.category}</td>
+                        <td>${asset.area}</td>
+                        <td>${asset.type}</td>
+                        <td>${asset.description}</td>
+                        <td><span class="badge badge-success">${asset.totalIncome}</span></td>
+                        <td><span class="badge badge-danger">${asset.totalExits}</span></td>
+                        <td><span class="badge badge-primary">${finalStock}</span></td>
+                        <td><span class="badge badge-${statusClass}">${status}</span></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                loading.style.display = 'none';
+            }, 1000);
+        }
+
+        function sendToGoogleSheets(data) {
+            // This would be the actual implementation to send data to Google Sheets
+            // For now, we'll simulate the API call
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log('Sending to Google Sheets:', data);
+                    
+                    if (data.action === 'addAsset') {
+                        assetsData.push({
+                            id: assetsData.length + 1,
+                            category: data.category,
+                            area: data.area,
+                            type: data.type,
+                            description: data.description,
+                            quantity: data.quantity,
+                            date: data.date,
+                            user: data.user
+                        });
+                    } else if (data.action === 'addExit') {
+                        exitsData.push({
+                            id: exitsData.length + 1,
+                            date: data.date,
+                            asset: data.asset,
+                            quantity: data.quantity,
+                            reason: data.reason,
+                            user: data.user
+                        });
+                    }
+                    
+                    resolve();
+                }, 500);
+            });
+            
+            // Real implementation would be:
+            /*
+            return fetch(CONFIG.APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+                return result;
+            });
+            */
+        }
+
+        function refreshData() {
+            loadData();
+            loadAssetsTable();
+            alert('Datos actualizados');
+        }
+
+        function exportToExcel() {
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Prepare assets data
+            const assetsForExport = [];
+            const assetSummary = {};
+            
+            assetsData.forEach(asset => {
+                const key = `${asset.category}-${asset.area}-${asset.type}-${asset.description}`;
+                if (!assetSummary[key]) {
+                    assetSummary[key] = {
+                        'Categoría': asset.category,
+                        'Área': asset.area,
+                        'Tipo': asset.type,
+                        'Descripción': asset.description,
+                        'Cantidad Ingresada': 0,
+                        'Cantidad Salida': 0,
+                        'Stock Final': 0
+                    };
+                }
+                assetSummary[key]['Cantidad Ingresada'] += asset.quantity;
+            });
+            
+            // Calculate exits
+            exitsData.forEach(exit => {
+                const asset = assetsData.find(a => 
+                    `${a.category} - ${a.description}` === exit.asset
+                );
+                if (asset) {
+                    const key = `${asset.category}-${asset.area}-${asset.type}-${asset.description}`;
+                    if (assetSummary[key]) {
+                        assetSummary[key]['Cantidad Salida'] += exit.quantity;
+                    }
+                }
+            });
+            
+            // Calculate final stock
+            Object.values(assetSummary).forEach(asset => {
+                asset['Stock Final'] = asset['Cantidad Ingresada'] - asset['Cantidad Salida'];
+                assetsForExport.push(asset);
+            });
+            
+            // Create worksheet
+            const ws = XLSX.utils.json_to_sheet(assetsForExport);
+            XLSX.utils.book_append_sheet(wb, ws, 'Activos');
+            
+            // Export file
+            const fileName = `Activos_${new Date().toISOString().split('T')[0]}.xlsx`;
+            XLSX.writeFile(wb, fileName);
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-open');
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+                sessionStorage.removeItem('currentUser');
+                currentUser = null;
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'flex';
+                
+                // Reset forms
+                document.getElementById('loginForm').reset();
+                document.getElementById('assetForm').reset();
+                document.getElementById('exitForm').reset();
+            }
+        }
+
+        // Handle window resize for responsive design
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(e.target) && 
+                !menuBtn.contains(e.target) && 
+                sidebar.classList.contains('mobile-open')) {
+                sidebar.classList.remove('mobile-open');
+            }
+        });
+    </script>
+</body>
+</html>
