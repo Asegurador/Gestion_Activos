@@ -802,7 +802,7 @@
     <script>
 // Configuration
 const CONFIG = {
-    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw4QfgpdFz5aSYshJyb09iGlsrAqPKZknt-n1nj0q5s3odOw1wy-_JaDNK9dcQm4wW6/exec',
+    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwnqDUf4FP6UeRctHUjXxp5YedgudZA2fotetsgWD99qyWg_qjyPuZO3QSR5F7MOWnD/exec',
     PROXY_URL: 'https://api.codetabs.com/v1/proxy?quest=',
     USERS: {
         'Joel': { password: 'joel3312', role: 'administrator', name: 'Administrador' },
@@ -1251,13 +1251,11 @@ function loadAssetsTable() {
 
 async function sendToGoogleSheets(data) {
     try {
-        const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: formData,
+      mode: 'cors'
+    });
 
         const result = await response.json(); // Ahora sí puede interpretarlo correctamente
 
