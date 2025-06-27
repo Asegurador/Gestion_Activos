@@ -799,11 +799,11 @@
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 
-    <script>
+<script>
 // Configuration
 const CONFIG = {
     APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzetgLXJqBIxruKt7ETRPJHoKk-YSpTrlrrtX71DqnYMOHWq7zBN3R98V-xsWWJh5o/exec',
-    PROXY_URL: 'https://api.codetabs.com/v1/proxy?quest=',
+    // Removed PROXY_URL as it's no longer needed for direct Apps Script communication
     USERS: {
         'Joel': { password: 'joel3312', role: 'administrator', name: 'Administrador' },
         'Rosana': { password: 'rosana2319', role: 'administrator', name: 'Administrador' },
@@ -959,7 +959,7 @@ async function handleAssetRegistration(e) {
         if (result.success) {
             showMessageModal('Éxito', 'Activo registrado exitosamente');
             document.getElementById('assetForm').reset();
-            await loadData();
+            await loadData(); // Reload data after successful registration
         } else {
             showMessageModal('Error', 'Error al registrar activo: ' + result.message);
         }
@@ -1007,7 +1007,7 @@ async function handleExitRegistration(e) {
             showMessageModal('Éxito', 'Salida registrada exitosamente');
             document.getElementById('exitForm').reset();
             document.getElementById('exitDate').value = new Date().toISOString().split('T')[0];
-            await loadData();
+            await loadData(); // Reload data after successful registration
         } else {
             showMessageModal('Error', 'Error al registrar salida: ' + result.message);
         }
@@ -1070,9 +1070,9 @@ function updateAvailableStock() {
 async function loadData() {
     showLoading(true);
     try {
-        // Use CORS proxy for GET requests
-        const assetsUrl = CONFIG.PROXY_URL + encodeURIComponent(CONFIG.APPS_SCRIPT_URL + '?action=getAssets');
-        const exitsUrl = CONFIG.PROXY_URL + encodeURIComponent(CONFIG.APPS_SCRIPT_URL + '?action=getExits');
+        // Direct access to Apps Script URL for GET requests (NO PROXY)
+        const assetsUrl = CONFIG.APPS_SCRIPT_URL + '?action=getAssets';
+        const exitsUrl = CONFIG.APPS_SCRIPT_URL + '?action=getExits';
         
         // Load assets
         const assetsResponse = await fetch(assetsUrl);
@@ -1251,7 +1251,6 @@ function loadAssetsTable() {
 
 async function sendToGoogleSheets(data) {
     try {
-        // Use FormData instead of JSON
         const formData = new FormData();
         for (const key in data) {
             formData.append(key, data[key]);
@@ -1263,12 +1262,17 @@ async function sendToGoogleSheets(data) {
             mode: 'cors'
         });
 
-        return { success: true, message: 'Operación completada en segundo plano' };
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result; // Return the actual result from the Apps Script
     } catch (error) {
         console.error('Error en sendToGoogleSheets:', error);
         return { 
             success: false, 
-            message: 'Operación completada en segundo plano. Verifica más tarde.' 
+            message: `Error al enviar datos: ${error.message || 'Error de red o servidor desconocido.'}` 
         };
     }
 }
@@ -1438,6 +1442,6 @@ document.addEventListener('click', function(e) {
         sidebar.classList.remove('mobile-open');
     }
 });
-    </script>
+</script>
 </body>
 </html>
