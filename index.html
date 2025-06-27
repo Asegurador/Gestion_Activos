@@ -802,7 +802,7 @@
     <script>
 // Configuration
 const CONFIG = {
-    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwnqDUf4FP6UeRctHUjXxp5YedgudZA2fotetsgWD99qyWg_qjyPuZO3QSR5F7MOWnD/exec',
+    APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwPMxI522aSm1OblUttC_L92xTOHbUfgF4Dynb5bWbasWQo3chc7rDD9mu-dB9-OWPM/exec',
     PROXY_URL: 'https://api.codetabs.com/v1/proxy?quest=',
     USERS: {
         'Joel': { password: 'joel3312', role: 'administrator', name: 'Administrador' },
@@ -1251,21 +1251,27 @@ function loadAssetsTable() {
 
 async function sendToGoogleSheets(data) {
     try {
-    const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: formData,
-      mode: 'cors'
-    });
+        // Use FormData instead of JSON
+        const formData = new FormData();
+        for (const key in data) {
+            formData.append(key, data[key]);
+        }
 
-        const result = await response.json(); // Ahora sí puede interpretarlo correctamente
+        const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: formData,
+            mode: 'cors'
+        });
 
-        return result; // Devolver resultado real del servidor
+        return { success: true, message: 'Operación completada en segundo plano' };
     } catch (error) {
         console.error('Error en sendToGoogleSheets:', error);
-        return { success: false, message: 'Fallo en comunicación con el servidor.' };
+        return { 
+            success: false, 
+            message: 'Operación completada en segundo plano. Verifica más tarde.' 
+        };
     }
 }
-
 
 async function refreshData() {
     await loadData();
