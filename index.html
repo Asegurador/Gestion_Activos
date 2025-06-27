@@ -804,7 +804,8 @@
         const CONFIG = {
             // ¡IMPORTANTE! Reemplaza esta URL con la URL de tu Web App de Google Apps Script.
             // Asegúrate de desplegar el script y copiar la URL de la versión que tenga "Acceso: Cualquiera".
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxrTGC6mli5zTh1Plxj-Jd-JWvAOW0i1xU9oOvElGowdGKSfR5RG4c6u_KmX312NcSQ/exec', 
+            // Esta URL DEBE SER LA MISMA que obtengas después de desplegar/actualizar tu Apps Script como Web App con acceso "Cualquiera".
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwYV0tCRcxUODAWs-TU4X8R4gaW8SOpaRRVQRScyKwjCtpTWnfraIpd5NY9Zyf6MPeH/exec', 
             USERS: {
                 'Joel': { password: 'joel3312', role: 'administrator', name: 'Administrador' },
                 'Rosana': { password: 'rosana2319', role: 'administrator', name: 'Administrador' },
@@ -876,7 +877,8 @@
                 sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
                 showMainApp();
             } else {
-                alert('Usuario o contraseña incorrectos');
+                // Usar una modal o un mensaje personalizado en lugar de alert()
+                showMessageModal('Error de inicio de sesión', 'Usuario o contraseña incorrectos.');
             }
         }
 
@@ -958,14 +960,14 @@
             try {
                 const result = await sendToGoogleSheets(assetData);
                 if (result.success) {
-                    alert('Activo registrado exitosamente');
+                    showMessageModal('Éxito', 'Activo registrado exitosamente');
                     document.getElementById('assetForm').reset();
                     await loadData(); // Reload all data after successful registration
                 } else {
-                    alert('Error al registrar activo: ' + result.message);
+                    showMessageModal('Error', 'Error al registrar activo: ' + result.message);
                 }
             } catch (error) {
-                alert('Error de comunicación al registrar activo: ' + error.message);
+                showMessageModal('Error de comunicación', 'Error de comunicación al registrar activo: ' + error.message);
                 console.error('Error al registrar activo:', error);
             } finally {
                 showLoading(false);
@@ -991,13 +993,13 @@
             );
             
             if (!selectedAsset) {
-                alert('Activo no encontrado o no seleccionable.');
+                showMessageModal('Error de validación', 'Activo no encontrado o no seleccionable.');
                 return;
             }
             
             const currentStock = calculateCurrentStock(selectedAsset);
             if (exitData.quantity > currentStock) {
-                alert(`Stock insuficiente. Stock disponible: ${currentStock}`);
+                showMessageModal('Stock Insuficiente', `Stock insuficiente. Stock disponible: ${currentStock}`);
                 return;
             }
             
@@ -1005,15 +1007,15 @@
             try {
                 const result = await sendToGoogleSheets(exitData);
                 if (result.success) {
-                    alert('Salida registrada exitosamente');
+                    showMessageModal('Éxito', 'Salida registrada exitosamente');
                     document.getElementById('exitForm').reset();
                     document.getElementById('exitDate').value = new Date().toISOString().split('T')[0];
                     await loadData(); // Reload all data after successful exit
                 } else {
-                    alert('Error al registrar salida: ' + result.message);
+                    showMessageModal('Error', 'Error al registrar salida: ' + result.message);
                 }
             } catch (error) {
-                alert('Error de comunicación al registrar salida: ' + error.message);
+                showMessageModal('Error de comunicación', 'Error de comunicación al registrar salida: ' + error.message);
                 console.error('Error al registrar salida:', error);
             } finally {
                 showLoading(false);
@@ -1084,23 +1086,32 @@
         async function loadData() {
             showLoading(true);
             try {
-                // Ensure your backend `doGet` functions are named 'getAssets' and 'getExits'
+                // Intentar cargar activos
                 const assetsResponse = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getAssets');
+                if (!assetsResponse.ok) {
+                    throw new Error(`HTTP error! status: ${assetsResponse.status}`);
+                }
                 const assetsResult = await assetsResponse.json();
                 if (assetsResult.success) {
-                    assetsData = assetsResult.data || []; // Expecting 'data' key from backend
+                    assetsData = assetsResult.data || [];
                 } else {
                     console.error('Error al obtener activos:', assetsResult.message);
                     assetsData = [];
+                    showMessageModal('Error de datos', 'No se pudieron cargar los datos de activos: ' + assetsResult.message);
                 }
 
+                // Intentar cargar salidas
                 const exitsResponse = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getExits');
+                if (!exitsResponse.ok) {
+                    throw new Error(`HTTP error! status: ${exitsResponse.status}`);
+                }
                 const exitsResult = await exitsResponse.json();
                 if (exitsResult.success) {
-                    exitsData = exitsResult.data || []; // Expecting 'data' key from backend
+                    exitsData = exitsResult.data || [];
                 } else {
                     console.error('Error al obtener salidas:', exitsResult.message);
                     exitsData = [];
+                    showMessageModal('Error de datos', 'No se pudieron cargar los datos de salidas: ' + exitsResult.message);
                 }
                 
                 updateDashboard();
@@ -1109,8 +1120,8 @@
                 
             } catch (error) {
                 console.error('Error de comunicación al cargar datos:', error);
-                alert('Error al cargar datos del servidor. Por favor, verifica tu conexión o la URL del Apps Script: ' + error.message);
-                assetsData = [];
+                showMessageModal('Error de Conexión', 'Error al cargar datos del servidor. Por favor, verifica tu conexión o la URL del Apps Script: ' + error.message);
+                assetsData = []; // Clear data on error to avoid displaying old/incorrect data
                 exitsData = [];
                 updateDashboard();
                 loadAssetsTable();
@@ -1268,7 +1279,7 @@
             loading.style.display = 'none';
         }
 
-              async function sendToGoogleSheets(data) {
+        async function sendToGoogleSheets(data) {
             console.log('Sending to Google Sheets:', data);
             try {
                 const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
@@ -1279,8 +1290,12 @@
                     body: JSON.stringify(data) // Your data is sent as JSON
                 });
 
+                // Verifica si la respuesta HTTP es exitosa (código 2xx)
                 if (!response.ok) {
+                    // Si no es exitosa, intenta leer el error del cuerpo de la respuesta
                     const errorText = await response.text();
+                    console.error('Error de respuesta HTTP del Apps Script:', errorText);
+                    // Lanza un error para que el bloque catch lo maneje
                     throw new Error(`Error de red o servidor (${response.status}): ${errorText}`);
                 }
 
@@ -1288,14 +1303,19 @@
                 return result;
                 
             } catch (error) {
+                // Este bloque captura errores de red (como CORS) o los errores lanzados arriba
                 console.error('Error en sendToGoogleSheets:', error);
-                throw error;
+                // Si el error es una instancia de TypeError (común para problemas de red/CORS)
+                if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+                    throw new Error('Error de conexión. Posiblemente un problema con la política CORS o la URL del Apps Script no es accesible. Revisa la consola para más detalles.');
+                }
+                throw error; // Relanza el error para que sea manejado por el llamador
             }
         }
 
         async function refreshData() {
             await loadData();
-            alert('Datos actualizados');
+            showMessageModal('Información', 'Datos actualizados.');
         }
 
         function exportToExcel() {
@@ -1363,9 +1383,66 @@
             }
         }
 
+        // --- Nuevo: Implementación de una Modal Personalizada para mensajes ---
+        // En lugar de alert() o confirm(), usamos una modal HTML
+        // Primero, añade el HTML para la modal en algún lugar de tu <body>, por ejemplo, antes del cierre de </body>
+        /*
+        <div id="messageModal" class="modal fade" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="messageModalLabel"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="messageModalBody">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary-modern" data-bs-dismiss="modal">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        */
+        // Asegúrate de tener Bootstrap JS cargado para que el modal funcione (ya lo tienes en tu código)
+        
+        function showMessageModal(title, message) {
+            const modalElement = document.createElement('div');
+            modalElement.id = 'tempMessageModal';
+            modalElement.className = 'modal fade';
+            modalElement.setAttribute('tabindex', '-1');
+            modalElement.setAttribute('aria-labelledby', 'tempMessageModalLabel');
+            modalElement.setAttribute('aria-hidden', 'true');
+            modalElement.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="tempMessageModalLabel">${title}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="tempMessageModalBody">
+                            ${message}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary-modern btn-modern" data-bs-dismiss="modal">Aceptar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalElement);
+
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+
+            // Eliminar la modal del DOM una vez que se cierra
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                modalElement.remove();
+            });
+        }
+
 
         function logout() {
-            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+            // Reemplaza confirm() con showConfirmModal()
+            showConfirmModal('Cerrar Sesión', '¿Está seguro que desea cerrar sesión?', () => {
                 sessionStorage.removeItem('currentUser');
                 currentUser = null;
                 document.getElementById('mainApp').style.display = 'none';
@@ -1375,8 +1452,50 @@
                 document.getElementById('loginForm').reset();
                 document.getElementById('assetForm').reset();
                 document.getElementById('exitForm').reset();
-            }
+            });
         }
+
+        // --- Nuevo: Implementación de una Modal Personalizada para Confirmación ---
+        function showConfirmModal(title, message, onConfirmCallback) {
+            const modalElement = document.createElement('div');
+            modalElement.id = 'tempConfirmModal';
+            modalElement.className = 'modal fade';
+            modalElement.setAttribute('tabindex', '-1');
+            modalElement.setAttribute('aria-labelledby', 'tempConfirmModalLabel');
+            modalElement.setAttribute('aria-hidden', 'true');
+            modalElement.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="tempConfirmModalLabel">${title}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="tempConfirmModalBody">
+                            ${message}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary-modern btn-modern" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-danger-modern btn-modern" id="confirmActionButton">Aceptar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modalElement);
+
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+
+            document.getElementById('confirmActionButton').onclick = () => {
+                onConfirmCallback();
+                modal.hide(); // Ocultar la modal después de la acción
+            };
+
+            // Eliminar la modal del DOM una vez que se cierra
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                modalElement.remove();
+            });
+        }
+
 
         // Handle window resize for responsive design
         window.addEventListener('resize', function() {
