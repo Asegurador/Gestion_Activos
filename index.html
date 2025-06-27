@@ -805,7 +805,7 @@
             // ¡IMPORTANTE! Reemplaza esta URL con la URL de tu Web App de Google Apps Script.
             // Asegúrate de desplegar el script y copiar la URL de la versión que tenga "Acceso: Cualquiera".
             // Esta URL DEBE SER LA MISMA que obtengas después de desplegar/actualizar tu Apps Script como Web App con acceso "Cualquiera".
-            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwYV0tCRcxUODAWs-TU4X8R4gaW8SOpaRRVQRScyKwjCtpTWnfraIpd5NY9Zyf6MPeH/exec', 
+            APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwPMxI522aSm1OblUttC_L92xTOHbUfgF4Dynb5bWbasWQo3chc7rDD9mu-dB9-OWPM/exec', 
             USERS: {
                 'Joel': { password: 'joel3312', role: 'administrator', name: 'Administrador' },
                 'Rosana': { password: 'rosana2319', role: 'administrator', name: 'Administrador' },
@@ -1024,42 +1024,30 @@
 
         // Calcula el stock actual de un activo específico
         function calculateCurrentStock(asset) {
-            if (!asset || !asset.category || !asset.description) {
-                console.warn("Activo inválido para calcular stock:", asset);
-                return 0;
-            }
-            const assetIdentifier = `${asset.category} - ${asset.description}`;
-            const exits = exitsData.filter(exit => 
-                exit.asset === assetIdentifier
-            );
-            const totalExits = exits.reduce((sum, exit) => sum + (exit.quantity || 0), 0);
-            return (asset.quantity || 0) - totalExits;
-        }
+  if (!asset || !asset.quantity) return 0;
+  
+  const assetId = `${asset.category}|${asset.description}`;
+  const exits = exitsData.filter(exit => exit.asset === assetId);
+  
+  return exits.reduce((total, exit) => total - (exit.quantity || 0), asset.quantity);
+}
 
         // Carga las opciones de activos en el selector de salida
         function loadAssetOptions() {
-            const select = document.getElementById('assetSelect');
-            select.innerHTML = '<option value="">Seleccionar activo</option>'; // Limpiar y añadir opción por defecto
-            
-            // Asegúrate de que assetsData y exitsData estén cargados
-            if (assetsData.length === 0) {
-                 // Si assetsData no está cargado, no hay nada que listar.
-                 // Podrías cargarla aquí si no se hace en otro lugar antes de llamar a esta función.
-                 // Por ahora, asumimos que loadData() ya se ha ejecutado.
-                 return;
-            }
-
-            assetsData.forEach(asset => {
-                const currentStock = calculateCurrentStock(asset);
-                if (currentStock > 0) { // Solo muestra activos con stock disponible
-                    const option = document.createElement('option');
-                    // Usamos solo la categoría y descripción como valor, y el stock para mostrar al usuario.
-                    option.value = `${asset.category} - ${asset.description}`; 
-                    option.textContent = `${asset.category} - ${asset.description} (Stock: ${currentStock})`;
-                    select.appendChild(option);
-                }
-            });
-        }
+  const select = document.getElementById('assetSelect');
+  select.innerHTML = '<option value="">Seleccionar activo</option>';
+  
+  assetsData.forEach(asset => {
+    const stock = calculateCurrentStock(asset);
+    if (stock > 0) {
+      const option = document.createElement('option');
+      const assetId = `${asset.category}|${asset.description}`;
+      option.value = assetId;
+      option.textContent = `${asset.category} - ${asset.description} (Stock: ${stock})`;
+      select.appendChild(option);
+    }
+  });
+}
 
         // Actualiza el campo de stock disponible cuando se selecciona un activo
         function updateAvailableStock() {
@@ -1279,39 +1267,31 @@
             loading.style.display = 'none';
         }
 
-        async function sendToGoogleSheets(data) {
-            console.log('Sending to Google Sheets:', data);
-            try {
-                const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-                    method: 'POST', // This is what triggers the POST in doPost
-                    headers: {
-                        'Content-Type': 'application/json', // This header is important for the backend to parse JSON
-                    },
-                    body: JSON.stringify(data) // Your data is sent as JSON
-                });
+async function sendToGoogleSheets(data) {
+  try {
+    // Usa encodeURIComponent para parámetros GET
+    const url = new URL(CONFIG.APPS_SCRIPT_URL);
+    
+    if (data.action) {
+      url.searchParams.append('action', data.action);
+    }
 
-                // Verifica si la respuesta HTTP es exitosa (código 2xx)
-                if (!response.ok) {
-                    // Si no es exitosa, intenta leer el error del cuerpo de la respuesta
-                    const errorText = await response.text();
-                    console.error('Error de respuesta HTTP del Apps Script:', errorText);
-                    // Lanza un error para que el bloque catch lo maneje
-                    throw new Error(`Error de red o servidor (${response.status}): ${errorText}`);
-                }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(data).toString()
+    });
 
-                const result = await response.json();
-                return result;
-                
-            } catch (error) {
-                // Este bloque captura errores de red (como CORS) o los errores lanzados arriba
-                console.error('Error en sendToGoogleSheets:', error);
-                // Si el error es una instancia de TypeError (común para problemas de red/CORS)
-                if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-                    throw new Error('Error de conexión. Posiblemente un problema con la política CORS o la URL del Apps Script no es accesible. Revisa la consola para más detalles.');
-                }
-                throw error; // Relanza el error para que sea manejado por el llamador
-            }
-        }
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error en sendToGoogleSheets:', error);
+    throw new Error(`Error de conexión: ${error.message}`);
+  }
+}
 
         async function refreshData() {
             await loadData();
