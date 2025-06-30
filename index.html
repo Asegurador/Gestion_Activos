@@ -1256,14 +1256,12 @@ function loadAssetsTable() {
 
 async function sendToGoogleSheets(data) {
     try {
-        const formData = new FormData();
-        for (const key in data) {
-            formData.append(key, data[key]);
-        }
-
         const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
             method: 'POST',
-            body: formData,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
             mode: 'cors'
         });
 
@@ -1276,12 +1274,13 @@ async function sendToGoogleSheets(data) {
 
     } catch (error) {
         console.error('Error en sendToGoogleSheets:', error);
-        return {
-            success: false,
-            message: `Error al enviar datos: ${error.message || 'Error desconocido'}`
+        return { 
+            success: false, 
+            message: `Error al enviar datos: ${error.message}` 
         };
     }
 }
+
 
 
 async function refreshData() {
