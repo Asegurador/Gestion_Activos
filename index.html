@@ -1070,47 +1070,52 @@ function updateAvailableStock() {
 async function loadData() {
     showLoading(true);
     try {
-        // Direct access to Apps Script URL for GET requests (NO PROXY)
         const assetsUrl = CONFIG.APPS_SCRIPT_URL + '?action=getAssets';
         const exitsUrl = CONFIG.APPS_SCRIPT_URL + '?action=getExits';
-        
-        // Load assets
-        const assetsResponse = await fetch(assetsUrl);
+
+        // Carga activos
+        const assetsResponse = await fetch(assetsUrl, {
+            method: 'GET',
+            mode: 'cors'
+        });
+
         if (!assetsResponse.ok) {
             throw new Error(`HTTP error! status: ${assetsResponse.status}`);
         }
-        const assetsResult = await assetsResponse.json();
-        if (assetsResult.success) {
-            assetsData = assetsResult.data || [];
-        } else {
-            console.error('Error al obtener activos:', assetsResult.message);
-            assetsData = [];
-        }
 
-        // Load exits
-        const exitsResponse = await fetch(exitsUrl);
+        const assetsResult = await assetsResponse.json();
+        assetsData = assetsResult.success ? assetsResult.data || [] : [];
+        if (!assetsResult.success) console.error('Error al obtener activos:', assetsResult.message);
+
+        // Carga salidas
+        const exitsResponse = await fetch(exitsUrl, {
+            method: 'GET',
+            mode: 'cors'
+        });
+
         if (!exitsResponse.ok) {
             throw new Error(`HTTP error! status: ${exitsResponse.status}`);
         }
+
         const exitsResult = await exitsResponse.json();
-        if (exitsResult.success) {
-            exitsData = exitsResult.data || [];
-        } else {
-            console.error('Error al obtener salidas:', exitsResult.message);
-            exitsData = [];
-        }
-        
+        exitsData = exitsResult.success ? exitsResult.data || [] : [];
+        if (!exitsResult.success) console.error('Error al obtener salidas:', exitsResult.message);
+
         updateDashboard();
         loadAssetsTable();
         loadAssetOptions();
-        
+
     } catch (error) {
         console.error('Error de comunicación al cargar datos:', error);
-        showMessageModal('Error de Conexión', 'Error al cargar datos del servidor. Por favor, verifica tu conexión: ' + error.message);
+        showMessageModal(
+            'Error de Conexión',
+            'Error al cargar datos del servidor. Verifica tu conexión o despliegue: ' + error.message
+        );
     } finally {
         showLoading(false);
     }
 }
+
 
 function updateDashboard() {
     const totalAssetsCount = assetsData.length;
@@ -1267,15 +1272,17 @@ async function sendToGoogleSheets(data) {
         }
 
         const result = await response.json();
-        return result; // Return the actual result from the Apps Script
+        return result;
+
     } catch (error) {
         console.error('Error en sendToGoogleSheets:', error);
-        return { 
-            success: false, 
-            message: `Error al enviar datos: ${error.message || 'Error de red o servidor desconocido.'}` 
+        return {
+            success: false,
+            message: `Error al enviar datos: ${error.message || 'Error desconocido'}`
         };
     }
 }
+
 
 async function refreshData() {
     await loadData();
