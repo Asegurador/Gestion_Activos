@@ -1258,11 +1258,11 @@ async function sendToGoogleSheets(data) {
     try {
         const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
             method: 'POST',
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data),
-            mode: 'cors'
+            body: JSON.stringify(data)
         });
 
         if (!response.ok) {
@@ -1274,14 +1274,12 @@ async function sendToGoogleSheets(data) {
 
     } catch (error) {
         console.error('Error en sendToGoogleSheets:', error);
-        return { 
-            success: false, 
-            message: `Error al enviar datos: ${error.message}` 
+        return {
+            success: false,
+            message: `Error al enviar datos: ${error.message || 'Error desconocido'}`
         };
     }
 }
-
-
 
 async function refreshData() {
     await loadData();
