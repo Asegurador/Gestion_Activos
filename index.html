@@ -1070,36 +1070,20 @@ function updateAvailableStock() {
 async function loadData() {
     showLoading(true);
     try {
-        const assetsUrl = CONFIG.APPS_SCRIPT_URL + '?action=getAssets';
-        const exitsUrl = CONFIG.APPS_SCRIPT_URL + '?action=getExits';
+        const [assetsResult, exitsResult] = await Promise.all([
+            sendToGoogleSheets({ action: 'getAssets' }),
+            sendToGoogleSheets({ action: 'getExits' })
+        ]);
 
-        // Carga activos
-        const assetsResponse = await fetch(assetsUrl, {
-            method: 'GET',
-            mode: 'cors'
-        });
-
-        if (!assetsResponse.ok) {
-            throw new Error(`HTTP error! status: ${assetsResponse.status}`);
+        if (!assetsResult.success) {
+            throw new Error('Error al obtener activos: ' + assetsResult.message);
+        }
+        if (!exitsResult.success) {
+            throw new Error('Error al obtener salidas: ' + exitsResult.message);
         }
 
-        const assetsResult = await assetsResponse.json();
-        assetsData = assetsResult.success ? assetsResult.data || [] : [];
-        if (!assetsResult.success) console.error('Error al obtener activos:', assetsResult.message);
-
-        // Carga salidas
-        const exitsResponse = await fetch(exitsUrl, {
-            method: 'GET',
-            mode: 'cors'
-        });
-
-        if (!exitsResponse.ok) {
-            throw new Error(`HTTP error! status: ${exitsResponse.status}`);
-        }
-
-        const exitsResult = await exitsResponse.json();
-        exitsData = exitsResult.success ? exitsResult.data || [] : [];
-        if (!exitsResult.success) console.error('Error al obtener salidas:', exitsResult.message);
+        assetsData = assetsResult.data || [];
+        exitsData = exitsResult.data || [];
 
         updateDashboard();
         loadAssetsTable();
@@ -1107,10 +1091,7 @@ async function loadData() {
 
     } catch (error) {
         console.error('Error de comunicación al cargar datos:', error);
-        showMessageModal(
-            'Error de Conexión',
-            'Error al cargar datos del servidor. Verifica tu conexión o despliegue: ' + error.message
-        );
+        showMessageModal('Error de Conexión', 'Error al cargar datos del servidor: ' + error.message);
     } finally {
         showLoading(false);
     }
