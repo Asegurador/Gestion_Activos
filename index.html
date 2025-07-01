@@ -1497,42 +1497,39 @@
             e.preventDefault();
 
             const submitBtn = document.getElementById('registerExitBtn');
-            // submitBtn.classList.add('loading'); // Ya tienes estas líneas
-            // submitBtn.disabled = true;
-
             showFullScreenLoading(true); // Mostrar el spinner de pantalla completa
 
-            const exitData = {
-                action: 'addExit',
-                date: document.getElementById('exitDate').value,
-                asset: document.getElementById('assetSelect').value,
-                quantity: parseInt(document.getElementById('exitQuantity').value),
-                reason: document.getElementById('exitReason').value,
-                user: currentUser.username
-            };
+            const assetValue = document.getElementById('assetSelect').value;
+            const [category, description] = assetValue.split('|||');
 
-            // Validate stock availability locally before sending
-            const selectedAssetDescription = exitData.asset.split(' (Stock:')[0].trim();
             const selectedAsset = assetsData.find(asset =>
-                `${asset.category} - ${asset.description}` === selectedAssetDescription
+                normalizeString(asset.category) === normalizeString(category) &&
+                normalizeString(asset.description) === normalizeString(description)
             );
 
             if (!selectedAsset) {
                 showMessageModal('Error de validación', 'Activo no encontrado o no seleccionable.', 'warning');
-                // submitBtn.classList.remove('loading'); // Quitar el spinner del botón
-                // submitBtn.disabled = false; // Habilitar el botón
-                showFullScreenLoading(false); // Ocultar el spinner de pantalla completa
+                showFullScreenLoading(false);
                 return;
             }
 
+            const exitQuantity = parseInt(document.getElementById('exitQuantity').value);
             const currentStock = calculateCurrentStock(selectedAsset);
-            if (exitData.quantity > currentStock) {
+
+            if (exitQuantity > currentStock) {
                 showMessageModal('Stock Insuficiente', `Stock insuficiente. Stock disponible: ${currentStock}`, 'warning');
-                // submitBtn.classList.remove('loading'); // Quitar el spinner del botón
-                // submitBtn.disabled = false; // Habilitar el botón
-                showFullScreenLoading(false); // Ocultar el spinner de pantalla completa
+                showFullScreenLoading(false);
                 return;
             }
+
+            const exitData = {
+                action: 'addExit',
+                date: document.getElementById('exitDate').value,
+                asset: `${selectedAsset.category} - ${selectedAsset.description}`,
+                quantity: exitQuantity,
+                reason: document.getElementById('exitReason').value,
+                user: currentUser.username
+            };
 
             try {
                 const result = await sendToGoogleSheets(exitData);
@@ -1540,8 +1537,8 @@
                     showMessageModal('Éxito', 'Salida registrada exitosamente!', 'success');
                     document.getElementById('exitForm').reset();
                     document.getElementById('exitDate').value = new Date().toISOString().split('T')[0];
-                    await loadData(); // Reload data after successful registration
-                    showSection('view'); // Navigate to view section to show updated stock
+                    await loadData(); // Recargar los datos
+                    showSection('view'); // Ir a la sección de visualización
                 } else {
                     showMessageModal('Error', 'Error al registrar salida: ' + result.message, 'danger');
                 }
@@ -1549,11 +1546,10 @@
                 showMessageModal('Error de comunicación', 'Error de comunicación al registrar salida: ' + error.message, 'danger');
                 console.error('Error al registrar salida:', error);
             } finally {
-                // submitBtn.classList.remove('loading'); // Quitar el spinner del botón
-                // submitBtn.disabled = false; // Habilitar el botón
-                showFullScreenLoading(false); // Ocultar el spinner de pantalla completa, siempre
+                showFullScreenLoading(false);
             }
         }
+
 
         function calculateCurrentStock(asset) {
             if (!asset || !asset.category || !asset.description) {
@@ -1572,24 +1568,46 @@
             const select = document.getElementById('assetSelect');
             select.innerHTML = '<option value="">Seleccionar activo</option>';
 
-            // Sort assets alphabetically by description for better user experience
+            // Ordenar alfabéticamente
             const sortedAssets = [...assetsData].sort((a, b) => {
                 const descA = `${a.category} - ${a.description}`.toLowerCase();
                 const descB = `${b.category} - ${b.description}`.toLowerCase();
-                if (descA < descB) return -1;
-                if (descA > descB) return 1;
-                return 0;
+                return descA.localeCompare(descB);
             });
 
             sortedAssets.forEach(asset => {
                 const currentStock = calculateCurrentStock(asset);
                 if (currentStock > 0) {
                     const option = document.createElement('option');
-                    option.value = `${asset.category} - ${asset.description}`;
+                    option.value = `${asset.category}|||${asset.description}`;
                     option.textContent = `${asset.category} - ${asset.description} (Stock: ${currentStock})`;
                     select.appendChild(option);
                 }
             });
+        }
+
+
+        function populateAssetSelect() {
+            const assetSelect = document.getElementById('assetSelect');
+            assetSelect.innerHTML = '<option value="">Seleccionar activo</option>'; // Limpiar opciones previas
+
+            assetsData.forEach(asset => {
+                const option = document.createElement('option');
+                // Normalizar la categoría y descripción aquí
+                const normalizedCategory = normalizeString(asset.category);
+                const normalizedDescription = normalizeString(asset.description);
+
+                // Asegúrate de que el valor coincida con el formato esperado por updateAvailableStock
+                option.value = `${normalizedCategory} - ${normalizedDescription} (Stock: ${calculateCurrentStock(asset)})`;
+                option.textContent = `${normalizedCategory} - ${normalizedDescription} (Stock: ${calculateCurrentStock(asset)})`;
+                assetSelect.appendChild(option);
+            });
+            // Añadir el event listener aquí después de poblar, o asegurarse de que se añade una vez
+            // Esto asume que el event listener no se está duplicando cada vez que se llama a populateAssetSelect
+            if (!assetSelect.hasAttribute('data-listener-added')) {
+                assetSelect.addEventListener('change', updateAvailableStock);
+                assetSelect.setAttribute('data-listener-added', 'true');
+            }
         }
 
         function updateAvailableStock() {
@@ -1597,10 +1615,12 @@
             const stockField = document.getElementById('availableStock');
 
             if (selectedValue) {
-                const selectedAssetDescription = selectedValue.split(' (Stock:')[0].trim();
+                const [category, description] = selectedValue.split('|||');
                 const asset = assetsData.find(a =>
-                    `${a.category} - ${a.description}` === selectedAssetDescription
+                    normalizeString(a.category) === normalizeString(category) &&
+                    normalizeString(a.description) === normalizeString(description)
                 );
+
                 if (asset) {
                     const currentStock = calculateCurrentStock(asset);
                     stockField.value = currentStock;
@@ -1611,6 +1631,18 @@
                 stockField.value = '';
             }
         }
+
+
+        // Función para normalizar cadenas: reemplaza múltiples espacios por uno solo y recorta
+        function normalizeString(str) {
+            if (typeof str !== 'string') return '';
+            return str
+                .toLowerCase()               // convierte a minúsculas
+                .replace(/["']/g, '')        // elimina comillas simples y dobles
+                .replace(/\s+/g, ' ')        // reduce espacios múltiples a uno
+                .trim();                     // elimina espacios al inicio y final
+        }
+
 
         async function loadData() {
             showFullScreenLoading(true); // Mostrar el spinner de pantalla completa al cargar datos
