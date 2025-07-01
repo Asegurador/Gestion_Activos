@@ -707,121 +707,89 @@
             }
         }
 
-        /* Smaller mobile devices / watches (highly simplified, might not be fully functional) */
+        /* Sobrescribe las reglas responsivas para la tabla de activos */
         @media (max-width: 480px) {
-            .login-box {
-                padding: 15px;
+
+            /* Asegura que la cabecera de la tabla siempre sea visible */
+            #assetsTable thead {
+                display: table-header-group !important;
+                /* Fuerza la visualización como cabecera de tabla */
             }
 
-            .login-box h2 {
-                font-size: 1.5em;
+            /* Restaura el comportamiento normal de la tabla, cuerpo, filas y celdas */
+            #assetsTable,
+            #assetsTable tbody,
+            #assetsTable tr,
+            #assetsTable td {
+                display: table !important;
+                /* O table-row, table-cell según el elemento */
+                width: auto !important;
+                /* Restaura el ancho automático */
             }
 
-            .input-box {
-                height: 45px;
-                margin-bottom: 20px;
+            #assetsTable tr {
+                margin-bottom: 0 !important;
+                /* Elimina el margen inferior */
+                border: none !important;
+                /* Elimina el borde de la tarjeta */
+                border-radius: 0 !important;
+                /* Elimina el radio del borde */
+                overflow: visible !important;
+                /* Restaura el overflow */
+                box-shadow: none !important;
+                /* Elimina la sombra de la tarjeta */
             }
 
-            .input-box label,
-            .input-box input {
-                font-size: 1em;
+            #assetsTable td {
+                text-align: left !important;
+                /* Restaura la alineación de texto a la izquierda */
+                padding-left: 10px !important;
+                /* Ajusta el padding a un valor normal (ejemplo) */
+                position: static !important;
+                /* Elimina el posicionamiento relativo */
+                border-bottom: 1px solid #dee2e6 !important;
+                /* Reestablece el borde inferior de celda (ajusta el color si es necesario) */
             }
 
-            .input-box .icon {
-                font-size: 1em;
-            }
-
-            .wrapper button {
-                height: 40px;
-                font-size: 1em;
-            }
-
-            .register-link {
-                font-size: 0.8em;
-            }
-
-            .sidebar {
-                width: 100%;
-                /* Full width for sidebar when open */
-            }
-
-            .main-content {
-                padding: 10px;
-            }
-
-            .header-bar h4 {
-                font-size: 1rem;
-            }
-
-            .glass-card {
-                padding: 15px;
-            }
-
-            .btn-modern {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-            }
-
-            .form-control {
-                padding: 10px 12px;
-                font-size: 0.9rem;
-            }
-
-            .table-modern th,
-            .table-modern td {
-                padding: 10px;
-                font-size: 0.8rem;
-            }
-
-            /* Force table to behave more like a list for very small screens */
-            .table-modern thead {
-                display: none;
-                /* Hide header */
-            }
-
-            .table-modern,
-            .table-modern tbody,
-            .table-modern tr,
-            .table-modern td {
-                display: block;
-                /* Make table elements behave like block elements */
-                width: 100%;
-            }
-
-            .table-modern tr {
-                margin-bottom: 15px;
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            }
-
-            .table-modern td {
-                text-align: right;
-                padding-left: 50%;
-                /* Space for label */
-                position: relative;
-                border-bottom: 1px solid #eee;
-            }
-
-            .table-modern td:before {
-                content: attr(data-label);
-                /* Use data-label for content */
-                position: absolute;
-                left: 10px;
-                width: calc(50% - 20px);
-                padding-right: 10px;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: bold;
-                color: var(--primary-color);
-            }
-
-            .table-modern td:last-child {
-                border-bottom: none;
+            /* Oculta completamente las etiquetas data-label que se muestran en móvil */
+            #assetsTable td:before {
+                content: none !important;
             }
         }
 
+        /* Si tu tabla #assetsTable tiene la clase .table-modern, también puedes ser más específico */
+        @media (max-width: 480px) {
+            #assetsTable.table-modern thead {
+                display: table-header-group !important;
+            }
+
+            #assetsTable.table-modern,
+            #assetsTable.table-modern tbody,
+            #assetsTable.table-modern tr,
+            #assetsTable.table-modern td {
+                display: table !important;
+                width: auto !important;
+            }
+
+            #assetsTable.table-modern tr {
+                margin-bottom: 0 !important;
+                border: none !important;
+                border-radius: 0 !important;
+                overflow: visible !important;
+                box-shadow: none !important;
+            }
+
+            #assetsTable.table-modern td {
+                text-align: left !important;
+                padding-left: 10px !important;
+                position: static !important;
+                border-bottom: 1px solid #dee2e6 !important;
+            }
+
+            #assetsTable.table-modern td:before {
+                content: none !important;
+            }
+        }
 
         .mobile-menu-btn {
             display: none;
