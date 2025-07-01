@@ -16,6 +16,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
@@ -36,17 +37,18 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* La fuente Montserrat se aplica aquí para el login y potencialmente para toda la app si no se sobrescribe */
             font-family: 'Montserrat', sans-serif;
         }
 
-        /* Estilos base del body - Mantienen tu fondo gradiente para el resto de la app si el login no está activo */
+        /* Estilos base del body - Mejorado para responsividad general */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Mantiene tu fuente original para el resto de la app */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             color: var(--primary-color);
             line-height: 1.6;
-            overflow-x: hidden;
+            min-height: 100vh; /* Asegura que el body ocupe al menos el 100% de la altura */
+            display: flex; /* Para controlar el layout con Flexbox/Grid si es necesario */
+            flex-direction: column;
         }
 
         /* --- Estilos del Nuevo Login "AuraSys" --- */
@@ -56,17 +58,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh; /* Asegura que ocupe al menos el 100% del alto de la ventana */
+            min-height: 100vh;
             width: 100%;
-            background: url('https://codingstella.com/wp-content/uploads/2024/01/download-5.jpeg') no-repeat;
-            background-size: cover;
-            background-position: center;
+            background: url('https://codingstella.com/wp-content/uploads/2024/01/download-5.jpeg') no-repeat center center / cover; /* Centrado y cubriendo */
             animation: animateBg 5s linear infinite;
-            /* Asegura que el wrapper del login sobrescriba el fondo del body cuando el login está visible */
-            position: absolute; /* Para que ocupe toda la pantalla y no afecte el layout del body */
+            position: fixed; /* Ocupa toda la pantalla y no permite scroll del contenido detrás */
             top: 0;
             left: 0;
-            z-index: 999; /* Asegura que esté por encima de otros elementos si existen */
+            z-index: 9999; /* Asegura que esté por encima de todo */
         }
 
         @keyframes animateBg {
@@ -78,8 +77,8 @@
         /* Caja del formulario de login */
         .login-box {
             position: relative;
-            width: 400px;
-            height: 450px;
+            width: clamp(300px, 90vw, 450px); /* Responsive width: min 300px, max 90vw, capped at 450px */
+            height: auto; /* Altura automática */
             background: transparent;
             border-radius: 15px;
             border: 2px solid rgba(255, 255, 255, .5);
@@ -87,23 +86,25 @@
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(15px);
-            padding: 20px; /* Añade un poco de padding para evitar que el contenido toque los bordes */
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
+            flex-direction: column; /* Apila elementos verticalmente */
         }
 
         .login-box h2 {
-            font-size: 2.2em; /* Ligeramente más grande para más impacto */
+            font-size: clamp(1.8em, 5vw, 2.5em); /* Responsive font size */
             color: #fff;
             text-align: center;
-            margin-bottom: 30px; /* Espacio debajo del título */
+            margin-bottom: 30px;
         }
 
         /* Caja de entrada de texto */
         .input-box {
             position: relative;
-            width: 100%; /* Ocupa el 100% del ancho de .login-box */
+            width: 100%;
             height: 50px;
-            margin-bottom: 30px; /* Espacio entre las cajas de entrada */
-            border-bottom: 2px solid #fff; /* Más prominente */
+            margin-bottom: 30px;
+            border-bottom: 2px solid #fff;
         }
 
         .input-box label {
@@ -111,7 +112,7 @@
             top: 50%;
             left: 5px;
             transform: translateY(-50%);
-            font-size: 1.1em; /* Ligeramente más grande */
+            font-size: 1.1em;
             color: #fff;
             pointer-events: none;
             transition: .5s;
@@ -120,8 +121,8 @@
         .input-box input:focus ~ label,
         .input-box input:valid ~ label {
             top: -5px;
-            font-size: 0.9em; /* Más pequeño al enfocar/validar */
-            color: #fff; /* Asegura que el color siga blanco */
+            font-size: 0.9em;
+            color: #fff;
         }
 
         .input-box input {
@@ -130,7 +131,7 @@
             background: transparent;
             border: none;
             outline: none;
-            font-size: 1.1em; /* Más grande para mejor legibilidad */
+            font-size: 1.1em;
             color: #fff;
             padding: 0 35px 0 5px;
         }
@@ -141,27 +142,27 @@
             top: 50%;
             color: #fff;
             transform: translateY(-50%);
-            font-size: 1.2em; /* Iconos un poco más grandes */
+            font-size: 1.2em;
         }
 
         /* Botón de login */
         .wrapper button {
             width: 100%;
-            height: 45px; /* Ligeramente más alto */
+            height: 45px;
             background-color: #fff;
             border: none;
             border-radius: 40px;
             cursor: pointer;
-            font-size: 1.1em; /* Más grande */
+            font-size: 1.1em;
             color: #000;
-            font-weight: 600; /* Más negrita */
-            margin-top: 20px; /* Espacio superior */
+            font-weight: 600;
+            margin-top: 20px;
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
 
         .wrapper button:hover {
-            background-color: #f0f0f0; /* Un ligero cambio al pasar el ratón */
-            transform: translateY(-2px); /* Pequeño efecto de elevación */
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
         }
 
         /* Enlace de registro/olvidaste contraseña */
@@ -182,28 +183,11 @@
             text-decoration: underline;
         }
 
-        /* Media Queries para Responsive Design del Login */
-        @media (max-width: 500px) {
-            .login-box {
-                width: 90%; /* Ajusta el ancho en pantallas pequeñas */
-                height: auto; /* Altura automática para adaptarse al contenido */
-                border: none;
-                border-radius: 0;
-                padding: 20px; /* Ajusta el padding para pantallas pequeñas */
-            }
-            .input-box {
-                width: 100%; /* Asegura que la caja de entrada ocupe todo el ancho disponible */
-            }
-            .wrapper {
-                background-position: left center; /* Ajusta la posición de la imagen de fondo */
-            }
-        }
-
         /* --- Tus estilos originales que no deben ser afectados --- */
 
         /* OCULTA EL CONTENEDOR DE LOGIN ANTIGUO */
         #loginScreen.login-container {
-            display: none; /* Asegura que tu login antiguo no se muestre */
+            display: none;
         }
 
         /* Clases de utilidad y componentes (glass-card, nav-item, buttons, etc.) */
@@ -213,6 +197,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-out; /* Animación para cards */
         }
 
         .nav-item {
@@ -277,6 +262,7 @@
             padding: 12px 16px;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem; /* Asegurar tamaño de fuente consistente */
         }
 
         .form-control:focus {
@@ -287,16 +273,18 @@
 
         .table-container {
             border-radius: 12px;
-            overflow: hidden;
+            overflow-x: auto; /* Makes table horizontally scrollable on small screens */
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         .table-modern {
             margin: 0;
             background: white;
+            min-width: 700px; /* Ensures table doesn't shrink too much on smaller screens */
+            width: 100%; /* Important for horizontal scrolling */
         }
 
-        .table-modern th {
+        .table-modern thead th {
             background: var(--primary-color);
             color: white;
             font-weight: 600;
@@ -307,14 +295,30 @@
             letter-spacing: 0.5px;
         }
 
-        .table-modern td {
+        .table-modern tbody td {
             padding: 16px;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
+            font-size: 0.9rem; /* Slightly smaller for compactness */
         }
 
-        .table-modern tr:hover {
+        .table-modern tbody tr:last-child td {
+            border-bottom: none; /* No border for the last row */
+        }
+
+        .table-modern tbody tr:hover {
             background: rgba(59, 130, 246, 0.05);
+        }
+
+        /* Animation for table rows loading */
+        .table-row-fade-in {
+            opacity: 0;
+            animation: fadeInRow 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInRow {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .badge-custom {
@@ -342,26 +346,6 @@
             border: 1px solid rgba(59, 130, 246, 0.2);
         }
 
-        /* Old login-container and login-card, will be hidden */
-        /* You had this in your original CSS, I've just added `display: none;` above */
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 400px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
         /* Sidebar y Main Content */
         .sidebar {
             background: var(--primary-color);
@@ -374,6 +358,7 @@
             top: 0;
             z-index: 1000;
             transition: all 0.3s ease;
+            overflow-y: auto; /* Scrollable sidebar if content overflows */
         }
 
         .sidebar-item {
@@ -381,6 +366,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-item i {
+            margin-right: 10px;
         }
 
         .sidebar-item:hover {
@@ -397,6 +388,7 @@
             margin-left: 250px;
             padding: 20px;
             transition: all 0.3s ease;
+            flex-grow: 1; /* Allows main content to take available space */
         }
 
         .header-bar {
@@ -408,10 +400,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+        }
+
+        .header-bar h4 {
+            font-size: clamp(1.2rem, 3vw, 1.8rem); /* Responsive font size */
         }
 
         .content-section {
             display: none;
+            animation: fadeIn 0.5s ease-out; /* Animación para secciones */
         }
 
         .content-section.active {
@@ -424,17 +422,23 @@
             padding: 25px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             border-left: 4px solid var(--accent-color);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .stats-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
         }
 
         .loading {
-            display: none;
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
+            color: var(--accent-color);
+            font-weight: 500;
+            text-align: center;
         }
 
         .spinner {
@@ -446,6 +450,28 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
         }
+
+        /* Animation for form submission */
+        .form-submission-spinner {
+            display: none;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #fff; /* White spinner for dark buttons */
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .btn-modern.loading .form-submission-spinner {
+            display: inline-block;
+        }
+
+        .btn-modern.loading span {
+            visibility: hidden; /* Hide text while loading */
+        }
+
 
         /* Estilos de fuente adicionales que tenías */
         .form-label,
@@ -460,10 +486,17 @@
             100% { transform: rotate(360deg); }
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         /* Media Queries para Sidebar y Mobile Button */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                width: 220px; /* Slightly narrower sidebar on mobile */
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2); /* Shadow when open */
             }
 
             .sidebar.mobile-open {
@@ -477,7 +510,134 @@
             .mobile-menu-btn {
                 display: block;
             }
+
+            .header-bar {
+                padding: 10px 15px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-bar > div:first-child {
+                width: 100%;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+
+            .header-bar > div:last-child {
+                width: 100%;
+                text-align: right;
+            }
+
+            .stats-card {
+                padding: 20px;
+            }
+            .stats-card h6 {
+                font-size: 0.9rem;
+            }
+            .stats-card h3 {
+                font-size: 1.5rem;
+            }
+
+            /* Adjust chart container on small screens */
+            #categoryChart, #areaChart {
+                height: 250px; /* Fixed height for charts on small screens */
+            }
         }
+
+        /* Smaller mobile devices / watches (highly simplified, might not be fully functional) */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 15px;
+            }
+            .login-box h2 {
+                font-size: 1.5em;
+            }
+            .input-box {
+                height: 45px;
+                margin-bottom: 20px;
+            }
+            .input-box label, .input-box input {
+                font-size: 1em;
+            }
+            .input-box .icon {
+                font-size: 1em;
+            }
+            .wrapper button {
+                height: 40px;
+                font-size: 1em;
+            }
+            .register-link {
+                font-size: 0.8em;
+            }
+
+            .sidebar {
+                width: 100%; /* Full width for sidebar when open */
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .header-bar h4 {
+                font-size: 1rem;
+            }
+
+            .glass-card {
+                padding: 15px;
+            }
+
+            .btn-modern {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .form-control {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .table-modern th, .table-modern td {
+                padding: 10px;
+                font-size: 0.8rem;
+            }
+
+            /* Force table to behave more like a list for very small screens */
+            .table-modern thead {
+                display: none; /* Hide header */
+            }
+            .table-modern, .table-modern tbody, .table-modern tr, .table-modern td {
+                display: block; /* Make table elements behave like block elements */
+                width: 100%;
+            }
+            .table-modern tr {
+                margin-bottom: 15px;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            }
+            .table-modern td {
+                text-align: right;
+                padding-left: 50%; /* Space for label */
+                position: relative;
+                border-bottom: 1px solid #eee;
+            }
+            .table-modern td:before {
+                content: attr(data-label); /* Use data-label for content */
+                position: absolute;
+                left: 10px;
+                width: calc(50% - 20px);
+                padding-right: 10px;
+                white-space: nowrap;
+                text-align: left;
+                font-weight: bold;
+                color: var(--primary-color);
+            }
+            .table-modern td:last-child {
+                border-bottom: none;
+            }
+        }
+
 
         .mobile-menu-btn {
             display: none;
@@ -487,11 +647,50 @@
             padding: 10px;
             border-radius: 8px;
             margin-right: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .mobile-menu-btn:hover {
+            background: #2563eb;
+        }
+
+        /* Modal styling */
+        .modal-content {
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .modal-header {
+            border-bottom: none;
+            padding: 20px 25px 10px;
+        }
+        .modal-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .modal-body {
+            padding: 10px 25px 20px;
+            color: var(--secondary-color);
+        }
+        .modal-footer {
+            border-top: none;
+            padding: 10px 25px 20px;
+        }
+        .btn-close {
+            background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+            border: 0;
+            border-radius: 0.375rem;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        .btn-close:hover {
+            opacity: 1;
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
     <div id="loginScreen" class="wrapper">
         <div class="login-box">
             <form id="loginForm" action="">
@@ -516,46 +715,44 @@
                 <button type="submit">Login</button>
     
                 <div class="register-link">
-                    <p>¿Olvidaste tu contraseña? <a href="https://wa.me/573133118664?text=JOEL%20SE%20ME%20OLVIDO%20LA%20CONTRASEÑA%20AYUDAME">Click Aquí</a></p>
+                    <p>¿Olvidaste tu contraseña? <a href="https://wa.me/573133118664?text=JOEL%20SE%20ME%20OLVIDO%20LA%20CONTRASEÑA%20AYUDAME" target="_blank">Click Aquí</a></p>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Main Application -->
-    <div id="mainApp" style="display: none;">
-        <!-- Sidebar -->
+    <div id="mainApp" style="display: none;" class="d-flex flex-column flex-md-row min-vh-100">
         <div class="sidebar" id="sidebar">
-            <div class="text-center p-3 border-bottom border-secondary">
+            <div class="text-center p-3 border-bottom border-secondary mb-3">
                 <i class="fas fa-building fa-2x mb-2"></i>
                 <h5>Gestión de Activos</h5>
                 <small id="userDisplay" class="text-light"></small>
             </div>
-            <div class="mt-3">
-                <div class="sidebar-item active" data-section="dashboard">
-                    <i class="fa fa-tachometer"> </i> Dashboard
+            <div class="mt-3 flex-grow-1 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="sidebar-item active" data-section="dashboard">
+                        <i class="fa fa-tachometer"> </i> Dashboard
+                    </div>
+                    <div class="sidebar-item" data-section="register">
+                        <i class="fas fa-plus-circle"></i> Registrar Activos
+                    </div>
+                    <div class="sidebar-item" data-section="exit">
+                        <i class="fas fa-minus-circle"></i> Registrar Salidas
+                    </div>
+                    <div class="sidebar-item" data-section="view">
+                        <i class="fas fa-table"></i> Ver Activos
+                    </div>
+                    <div class="sidebar-item" data-section="reports">
+                        <i class="fas fa-chart-bar"></i> Reportes
+                    </div>
                 </div>
-                <div class="sidebar-item" data-section="register">
-                    <i class="fas fa-plus-circle me-2"></i>Registrar Activos
-                </div>
-                <div class="sidebar-item" data-section="exit">
-                    <i class="fas fa-minus-circle me-2"></i>Registrar Salidas
-                </div>
-                <div class="sidebar-item" data-section="view">
-                    <i class="fas fa-table me-2"></i>Ver Activos
-                </div>
-                <div class="sidebar-item" data-section="reports">
-                    <i class="fas fa-chart-bar me-2"></i>Reportes
-                </div>
-                <div class="sidebar-item mt-auto" onclick="logout()">
-                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                <div class="sidebar-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
+        <div class="main-content flex-grow-1">
             <div class="header-bar">
                 <div class="d-flex align-items-center">
                     <button class="mobile-menu-btn" onclick="toggleSidebar()">
@@ -563,16 +760,15 @@
                     </button>
                     <h4 class="mb-0" id="sectionTitle">Dashboard</h4>
                 </div>
-                <div>
+                <div class="mt-2 mt-md-0">
                     <span class="text-muted">Bienvenido, </span>
                     <strong id="headerUser"></strong>
                 </div>
             </div>
 
-            <!-- Dashboard Section -->
             <div id="dashboard" class="content-section active">
                 <div class="row mb-4">
-                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                    <div class="col-xl-3 col-md-6 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -583,7 +779,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                    <div class="col-xl-3 col-md-6 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -594,7 +790,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                    <div class="col-xl-3 col-md-6 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -605,7 +801,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+                    <div class="col-xl-3 col-md-6 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -621,29 +817,26 @@
                 <div class="glass-card p-4">
                     <h5 class="mb-3">Resumen de Actividad</h5>
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-lg-6 mb-4 mb-lg-0">
                             <h6>Últimos Registros</h6>
                             <div id="recentActivity" class="mt-3">
-                                <!-- Activity items will be populated here -->
-                            </div>
+                                </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-lg-6">
                             <h6>Categorías Principales</h6>
                             <div id="topCategories" class="mt-3">
-                                <!-- Category items will be populated here -->
-                            </div>
+                                </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Register Assets Section -->
             <div id="register" class="content-section">
                 <div class="glass-card p-4">
                     <h5 class="mb-4">Registrar Nuevo Activo</h5>
                     <form id="assetForm">
                         <div class="row">
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Categoría</label>
                                 <select class="form-control" id="category" required>
                                     <option value="">Seleccionar categoría</option>
@@ -655,7 +848,7 @@
                                     <option value="Vehículos">Vehículos</option>
                                 </select>
                             </div>
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Área</label>
                                 <select class="form-control" id="area" required>
                                     <option value="">Seleccionar área</option>
@@ -667,7 +860,7 @@
                                     <option value="Ventas">Ventas</option>
                                 </select>
                             </div>
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Tipo</label>
                                 <select class="form-control" id="type" required>
                                     <option value="">Seleccionar tipo</option>
@@ -679,7 +872,7 @@
                                     <option value="Textil">Textil</option>
                                 </select>
                             </div>
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Cantidad Total</label>
                                 <input type="number" class="form-control" id="quantity" min="1" required>
                             </div>
@@ -688,34 +881,34 @@
                                 <textarea class="form-control" id="description" rows="3" required></textarea>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success-modern btn-modern">
-                            <i class="fas fa-save me-2"></i>Registrar Activo
+                        <button type="submit" class="btn btn-success-modern btn-modern" id="registerAssetBtn">
+                            <span><i class="fas fa-save me-2"></i>Registrar Activo</span>
+                            <div class="form-submission-spinner"></div>
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- Register Exits Section -->
             <div id="exit" class="content-section">
                 <div class="glass-card p-4">
                     <h5 class="mb-4">Registrar Salida de Activo</h5>
                     <form id="exitForm">
                         <div class="row">
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Fecha</label>
                                 <input type="date" class="form-control" id="exitDate" required>
                             </div>
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Activo</label>
                                 <select class="form-control" id="assetSelect" required>
                                     <option value="">Seleccionar activo</option>
                                 </select>
                             </div>
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Cantidad a Salir</label>
                                 <input type="number" class="form-control" id="exitQuantity" min="1" required>
                             </div>
-                            <div class="col-12 col-md-6 mb-3">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Stock Disponible</label>
                                 <input type="text" class="form-control" id="availableStock" readonly>
                             </div>
@@ -724,20 +917,20 @@
                                 <textarea class="form-control" id="exitReason" rows="3" required></textarea>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-danger-modern btn-modern">
-                            <i class="fas fa-minus-circle me-2"></i>Registrar Salida
+                        <button type="submit" class="btn btn-danger-modern btn-modern" id="registerExitBtn">
+                            <span><i class="fas fa-minus-circle me-2"></i>Registrar Salida</span>
+                            <div class="form-submission-spinner"></div>
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- View Assets Section -->
             <div id="view" class="content-section">
                 <div class="glass-card p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="mb-0">Lista de Activos</h5>
-                        <div>
-                            <button class="btn btn-primary-modern btn-modern me-2" onclick="refreshData()">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+                        <h5 class="mb-2 mb-md-0">Lista de Activos</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-primary-modern btn-modern" onclick="refreshData()">
                                 <i class="fas fa-sync-alt me-2"></i>Actualizar
                             </button>
                             <button class="btn btn-success-modern btn-modern" onclick="exportToExcel()">
@@ -751,8 +944,8 @@
                         <p>Cargando datos...</p>
                     </div>
                     
-                      <div class="table-container table-responsive">
-                        <table class="table table-modern w-100">
+                    <div class="table-container">
+                        <table class="table table-modern">
                             <thead>
                                 <tr>
                                     <th>Categoría</th>
@@ -766,28 +959,73 @@
                                 </tr>
                             </thead>
                             <tbody id="assetsTableBody">
-                                <!-- Data will be populated here -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Reports Section -->
             <div id="reports" class="content-section">
                 <div class="glass-card p-4">
                     <h5 class="mb-4">Reportes y Análisis</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fecha Inicio</label>
+                            <input type="date" class="form-control" id="reportStartDate">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fecha Fin</label>
+                            <input type="date" class="form-control" id="reportEndDate">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Filtrar por Categoría</label>
+                            <select class="form-control" id="reportCategoryFilter">
+                                <option value="">Todas</option>
+                                <option value="Electrodoméstico">Electrodoméstico</option>
+                                <option value="Mobiliario">Mobiliario</option>
+                                <option value="Equipo de Oficina">Equipo de Oficina</option>
+                                <option value="Herramientas">Herramientas</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Vehículos">Vehículos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Filtrar por Área</label>
+                            <select class="form-control" id="reportAreaFilter">
+                                <option value="">Todas</option>
+                                <option value="Cocina">Cocina</option>
+                                <option value="Administración">Administración</option>
+                                <option value="Almacén">Almacén</option>
+                                <option value="Producción">Producción</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                                <option value="Ventas">Ventas</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button class="btn btn-primary-modern btn-modern" onclick="generateReports()">
+                                <i class="fas fa-chart-line me-2"></i>Generar Reportes
+                            </button>
+                        </div>
+                    </div>
                     <div class="row">
-                        <div class="col-12 col-md-6 mb-3">
+                        <div class="col-lg-6 mb-4 mb-lg-0">
                             <h6>Activos por Categoría</h6>
-                            <div id="categoryChart" class="mt-3">
-                                <!-- Chart will be populated here -->
+                            <div class="chart-container" style="position: relative; height:300px; width:100%">
+                                <canvas id="categoryChart"></canvas>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6 mb-3">
-                            <h6>Movimientos por Área</h6>
-                            <div id="areaChart" class="mt-3">
-                                <!-- Chart will be populated here -->
+                        <div class="col-lg-6">
+                            <h6>Movimientos de Stock (Entradas vs Salidas)</h6>
+                            <div class="chart-container" style="position: relative; height:300px; width:100%">
+                                <canvas id="stockMovementChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h6>Activos por Área</h6>
+                            <div class="chart-container" style="position: relative; height:300px; width:100%">
+                                <canvas id="areaChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -804,7 +1042,6 @@
 // Configuration
 const CONFIG = {
     APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzOqemfEhkA1RxniZJWZlb3nVjiF7SkqmzLq5wbC0wZulS4dlG7zLyjW0AzcgDeSRj5/exec',
-
     USERS: {
         'Joel': { password: 'joel3312', role: 'administrator', name: 'Administrador' },
         'Rosana': { password: 'rosana2319', role: 'administrator', name: 'Administrador' },
@@ -818,6 +1055,9 @@ const CONFIG = {
 let currentUser = null;
 let assetsData = [];
 let exitsData = [];
+let categoryChartInstance = null;
+let areaChartInstance = null;
+let stockMovementChartInstance = null;
 
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
@@ -859,6 +1099,13 @@ function setupEventListeners() {
     
     // Asset selection change
     document.getElementById('assetSelect').addEventListener('change', updateAvailableStock);
+
+    // Report filters change
+    document.getElementById('reportStartDate').addEventListener('change', generateReports);
+    document.getElementById('reportEndDate').addEventListener('change', generateReports);
+    document.getElementById('reportCategoryFilter').addEventListener('change', generateReports);
+    document.getElementById('reportAreaFilter').addEventListener('change', generateReports);
+
 }
 
 function handleLogin(e) {
@@ -882,7 +1129,7 @@ function handleLogin(e) {
 
 function showMainApp() {
     document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
+    document.getElementById('mainApp').style.display = 'flex'; // Use flex for main app layout
     
     // Display user info
     document.getElementById('userDisplay').textContent = currentUser.name;
@@ -902,6 +1149,9 @@ function setupUserPermissions() {
     if (currentUser.role === 'readonly') {
         registerSection.style.display = 'none';
         exitSection.style.display = 'none';
+    } else {
+        registerSection.style.display = 'flex'; // Ensure visibility if role changes
+        exitSection.style.display = 'flex';
     }
 }
 
@@ -938,11 +1188,20 @@ function showSection(sectionName) {
     } else if (sectionName === 'dashboard') {
         updateDashboard();
     }
+
+    // *** NEW: Close sidebar on mobile after selection ***
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('mobile-open');
+    }
 }
 
 async function handleAssetRegistration(e) {
     e.preventDefault();
     
+    const submitBtn = document.getElementById('registerAssetBtn');
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
     const assetData = {
         action: 'addAsset',
         category: document.getElementById('category').value,
@@ -954,7 +1213,6 @@ async function handleAssetRegistration(e) {
         user: currentUser.username
     };
     
-    showLoading(true);
     try {
         const result = await sendToGoogleSheets(assetData);
         if (result.success) {
@@ -968,13 +1226,18 @@ async function handleAssetRegistration(e) {
         showMessageModal('Error de comunicación', 'Error de comunicación al registrar activo: ' + error.message);
         console.error('Error al registrar activo:', error);
     } finally {
-        showLoading(false);
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
     }
 }
 
 async function handleExitRegistration(e) {
     e.preventDefault();
     
+    const submitBtn = document.getElementById('registerExitBtn');
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
     const exitData = {
         action: 'addExit',
         date: document.getElementById('exitDate').value,
@@ -992,16 +1255,19 @@ async function handleExitRegistration(e) {
     
     if (!selectedAsset) {
         showMessageModal('Error de validación', 'Activo no encontrado o no seleccionable.');
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
         return;
     }
     
     const currentStock = calculateCurrentStock(selectedAsset);
     if (exitData.quantity > currentStock) {
         showMessageModal('Stock Insuficiente', `Stock insuficiente. Stock disponible: ${currentStock}`);
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
         return;
     }
     
-    showLoading(true);
     try {
         const result = await sendToGoogleSheets(exitData);
         if (result.success) {
@@ -1016,7 +1282,8 @@ async function handleExitRegistration(e) {
         showMessageModal('Error de comunicación', 'Error de comunicación al registrar salida: ' + error.message);
         console.error('Error al registrar salida:', error);
     } finally {
-        showLoading(false);
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
     }
 }
 
@@ -1037,7 +1304,16 @@ function loadAssetOptions() {
     const select = document.getElementById('assetSelect');
     select.innerHTML = '<option value="">Seleccionar activo</option>';
     
-    assetsData.forEach(asset => {
+    // Sort assets alphabetically by description for better user experience
+    const sortedAssets = [...assetsData].sort((a, b) => {
+        const descA = `${a.category} - ${a.description}`.toLowerCase();
+        const descB = `${b.category} - ${b.description}`.toLowerCase();
+        if (descA < descB) return -1;
+        if (descA > descB) return 1;
+        return 0;
+    });
+
+    sortedAssets.forEach(asset => {
         const currentStock = calculateCurrentStock(asset);
         if (currentStock > 0) {
             const option = document.createElement('option');
@@ -1071,8 +1347,10 @@ function updateAvailableStock() {
 async function loadData() {
     showLoading(true);
     try {
-        const assetsRes = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getAssets');
-        const exitsRes = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getExits');
+        const [assetsRes, exitsRes] = await Promise.all([
+            fetch(CONFIG.APPS_SCRIPT_URL + '?action=getAssets'),
+            fetch(CONFIG.APPS_SCRIPT_URL + '?action=getExits')
+        ]);
 
         const assetsResult = await assetsRes.json();
         const exitsResult = await exitsRes.json();
@@ -1083,6 +1361,7 @@ async function loadData() {
         updateDashboard();
         loadAssetsTable();
         loadAssetOptions();
+        generateReports(); // Also update reports when data loads
 
     } catch (error) {
         console.error('Error de comunicación al cargar datos:', error);
@@ -1113,19 +1392,36 @@ function updateDashboard() {
 
 function updateRecentActivity() {
     const container = document.getElementById('recentActivity');
-    const recentAssets = [...assetsData].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
-    
+    // Combine assets and exits for recent activity, sort by date
+    const allActivities = [
+        ...assetsData.map(a => ({ ...a, type: 'asset', activityDate: new Date(a.date) })),
+        ...exitsData.map(e => ({ ...e, type: 'exit', activityDate: new Date(e.date) }))
+    ].sort((a, b) => b.activityDate - a.activityDate).slice(0, 5); // Show top 5 recent activities
+
     container.innerHTML = '';
-    if (recentAssets.length === 0) {
-        container.innerHTML = '<p class="text-muted">No hay registros recientes.</p>';
+    if (allActivities.length === 0) {
+        container.innerHTML = '<p class="text-muted">No hay actividad reciente.</p>';
+        return;
     }
-    recentAssets.forEach(asset => {
+    allActivities.forEach(activity => {
         const item = document.createElement('div');
-        item.className = 'border-start border-3 border-success ps-3 mb-3';
+        item.className = `border-start border-3 ps-3 mb-3 ${activity.type === 'asset' ? 'border-success' : 'border-danger'}`;
+        
+        let descriptionText = '';
+        let quantityBadge = '';
+
+        if (activity.type === 'asset') {
+            descriptionText = `${activity.description} (${activity.category})`;
+            quantityBadge = `<span class="badge badge-success">+${activity.quantity}</span>`;
+        } else { // type === 'exit'
+            descriptionText = `${activity.asset} (Salida)`;
+            quantityBadge = `<span class="badge badge-danger">-${activity.quantity}</span>`;
+        }
+
         item.innerHTML = `
-            <div class="fw-bold">${asset.description}</div>
-            <small class="text-muted">${asset.category} - ${new Date(asset.date).toLocaleDateString()}</small>
-            <div><span class="badge badge-success">+${asset.quantity}</span></div>
+            <div class="fw-bold">${descriptionText}</div>
+            <small class="text-muted">${activity.activityDate.toLocaleDateString()}</small>
+            <div>${quantityBadge}</div>
         `;
         container.appendChild(item);
     });
@@ -1149,6 +1445,7 @@ function updateTopCategories() {
     container.innerHTML = '';
     if (sortedCategories.length === 0) {
         container.innerHTML = '<p class="text-muted">No hay categorías para mostrar.</p>';
+        return;
     }
     sortedCategories.forEach(([category, count]) => {
         const item = document.createElement('div');
@@ -1165,7 +1462,7 @@ function loadAssetsTable() {
     const tableBody = document.getElementById('assetsTableBody');
     const loading = document.getElementById('tableLoading');
     
-    loading.style.display = 'block';
+    loading.style.display = 'flex'; // Use flex for loading spinner alignment
     tableBody.innerHTML = '';
 
     const assetSummary = {};
@@ -1203,24 +1500,38 @@ function loadAssetsTable() {
     });
     
     const assetsToDisplay = Object.values(assetSummary);
+
+    // Sort assets for consistent display
+    assetsToDisplay.sort((a, b) => {
+        const descA = `${a.category}-${a.description}`.toLowerCase();
+        const descB = `${b.category}-${b.description}`.toLowerCase();
+        if (descA < descB) return -1;
+        if (descA > descB) return 1;
+        return 0;
+    });
+
     if (assetsToDisplay.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">No hay activos registrados.</td></tr>`;
     } else {
-        assetsToDisplay.forEach(asset => {
+        assetsToDisplay.forEach((asset, index) => {
             const finalStock = asset.totalIncome - asset.totalExits;
             const status = finalStock > 0 ? 'Disponible' : 'Agotado';
             const statusClass = finalStock > 0 ? 'success' : 'danger';
             
             const row = document.createElement('tr');
+            row.classList.add('table-row-fade-in'); // Add fade-in animation class
+            row.style.animationDelay = `${index * 0.05}s`; // Stagger animation
+            
+            // Add data-label for mobile view
             row.innerHTML = `
-                <td>${asset.category}</td>
-                <td>${asset.area}</td>
-                <td>${asset.type}</td>
-                <td>${asset.description}</td>
-                <td><span class="badge badge-success">${asset.totalIncome}</span></td>
-                <td><span class="badge badge-danger">${asset.totalExits}</span></td>
-                <td><span class="badge badge-primary">${finalStock}</span></td>
-                <td><span class="badge badge-${statusClass}">${status}</span></td>
+                <td data-label="Categoría">${asset.category}</td>
+                <td data-label="Área">${asset.area}</td>
+                <td data-label="Tipo">${asset.type}</td>
+                <td data-label="Descripción">${asset.description}</td>
+                <td data-label="Ingresado"><span class="badge badge-success">${asset.totalIncome}</span></td>
+                <td data-label="Salidas"><span class="badge badge-danger">${asset.totalExits}</span></td>
+                <td data-label="Stock Final"><span class="badge badge-primary">${finalStock}</span></td>
+                <td data-label="Estado"><span class="badge badge-${statusClass}">${status}</span></td>
             `;
             tableBody.appendChild(row);
         });
@@ -1248,7 +1559,6 @@ async function sendToGoogleSheets(data) {
         };
     }
 }
-
 
 async function refreshData() {
     await loadData();
@@ -1301,6 +1611,214 @@ function exportToExcel() {
     XLSX.writeFile(wb, fileName);
 }
 
+// Charting Functions
+function generateReports() {
+    const startDate = document.getElementById('reportStartDate').value;
+    const endDate = document.getElementById('reportEndDate').value;
+    const categoryFilter = document.getElementById('reportCategoryFilter').value;
+    const areaFilter = document.getElementById('reportAreaFilter').value;
+
+    const filteredAssets = assetsData.filter(asset => {
+        const assetDate = new Date(asset.date);
+        const matchesDate = (!startDate || assetDate >= new Date(startDate)) && (!endDate || assetDate <= new Date(endDate + 'T23:59:59')); // Add end of day for endDate
+        const matchesCategory = !categoryFilter || asset.category === categoryFilter;
+        const matchesArea = !areaFilter || asset.area === areaFilter;
+        return matchesDate && matchesCategory && matchesArea;
+    });
+
+    const filteredExits = exitsData.filter(exit => {
+        const exitDate = new Date(exit.date);
+        const matchesDate = (!startDate || exitDate >= new Date(startDate)) && (!endDate || exitDate <= new Date(endDate + 'T23:59:59'));
+        // For exits, we need to check the category/area of the asset being exited
+        const associatedAsset = assetsData.find(asset => `${asset.category} - ${asset.description}` === exit.asset);
+        const matchesCategory = !categoryFilter || (associatedAsset && associatedAsset.category === categoryFilter);
+        const matchesArea = !areaFilter || (associatedAsset && associatedAsset.area === areaFilter);
+        return matchesDate && matchesCategory && matchesArea;
+    });
+
+    renderCategoryChart(filteredAssets);
+    renderStockMovementChart(filteredAssets, filteredExits);
+    renderAreaChart(filteredAssets);
+}
+
+function renderCategoryChart(data) {
+    const ctx = document.getElementById('categoryChart').getContext('2d');
+    
+    if (categoryChartInstance) {
+        categoryChartInstance.destroy();
+    }
+
+    const categoryCounts = {};
+    data.forEach(asset => {
+        categoryCounts[asset.category] = (categoryCounts[asset.category] || 0) + (asset.quantity || 0);
+    });
+
+    const labels = Object.keys(categoryCounts);
+    const values = Object.values(categoryCounts);
+
+    categoryChartInstance = new Chart(ctx, {
+        type: 'pie', // Pie chart for categories
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: [
+                    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#eab308', '#ec4899', '#84cc16'
+                ],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Activos por Categoría'
+                }
+            }
+        }
+    });
+}
+
+function renderAreaChart(data) {
+    const ctx = document.getElementById('areaChart').getContext('2d');
+    
+    if (areaChartInstance) {
+        areaChartInstance.destroy();
+    }
+
+    const areaCounts = {};
+    data.forEach(asset => {
+        areaCounts[asset.area] = (areaCounts[asset.area] || 0) + (asset.quantity || 0);
+    });
+
+    const labels = Object.keys(areaCounts);
+    const values = Object.values(areaCounts);
+
+    areaChartInstance = new Chart(ctx, {
+        type: 'bar', // Bar chart for areas
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cantidad de Activos',
+                data: values,
+                backgroundColor: '#3b82f6',
+                borderColor: '#2563eb',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: 'Activos por Área'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function renderStockMovementChart(assets, exits) {
+    const ctx = document.getElementById('stockMovementChart').getContext('2d');
+    
+    if (stockMovementChartInstance) {
+        stockMovementChartInstance.destroy();
+    }
+
+    const monthlyData = {};
+
+    assets.forEach(asset => {
+        const date = new Date(asset.date);
+        const month = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+        if (!monthlyData[month]) {
+            monthlyData[month] = { income: 0, exits: 0 };
+        }
+        monthlyData[month].income += asset.quantity || 0;
+    });
+
+    exits.forEach(exit => {
+        const date = new Date(exit.date);
+        const month = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+        if (!monthlyData[month]) {
+            monthlyData[month] = { income: 0, exits: 0 };
+        }
+        monthlyData[month].exits += exit.quantity || 0;
+    });
+
+    const sortedMonths = Object.keys(monthlyData).sort();
+    const incomeData = sortedMonths.map(month => monthlyData[month].income);
+    const exitData = sortedMonths.map(month => monthlyData[month].exits);
+
+    stockMovementChartInstance = new Chart(ctx, {
+        type: 'line', // Line chart for movement over time
+        data: {
+            labels: sortedMonths,
+            datasets: [
+                {
+                    label: 'Entradas',
+                    data: incomeData,
+                    borderColor: 'rgb(16, 185, 129)', // success-color
+                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Salidas',
+                    data: exitData,
+                    borderColor: 'rgb(239, 68, 68)', // danger-color
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    tension: 0.3,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Movimiento de Stock Mensual'
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mes'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Cantidad'
+                    }
+                }
+            }
+        }
+    });
+}
+
+
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('mobile-open');
@@ -1309,7 +1827,7 @@ function toggleSidebar() {
 function showLoading(show) {
     const loadingElement = document.getElementById('tableLoading');
     if (loadingElement) {
-        loadingElement.style.display = show ? 'block' : 'none';
+        loadingElement.style.display = show ? 'flex' : 'none'; // Use flex for centering
     }
 }
 
@@ -1404,10 +1922,12 @@ window.addEventListener('resize', function() {
     }
 });
 
+// Close sidebar when clicking outside on mobile
 document.addEventListener('click', function(e) {
     const sidebar = document.getElementById('sidebar');
     const menuBtn = document.querySelector('.mobile-menu-btn');
     
+    // Check if the click is outside the sidebar and the menu button, and if the sidebar is open
     if (window.innerWidth <= 768 && 
         !sidebar.contains(e.target) && 
         !menuBtn.contains(e.target) && 
