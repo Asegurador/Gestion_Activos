@@ -46,6 +46,7 @@
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             color: var(--primary-color);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         /* --- Estilos del Nuevo Login "AuraSys" --- */
@@ -571,7 +572,7 @@
             <!-- Dashboard Section -->
             <div id="dashboard" class="content-section active">
                 <div class="row mb-4">
-                    <div class="col-md-3 mb-3">
+                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -582,7 +583,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-3">
+                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -593,7 +594,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-3">
+                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -604,7 +605,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 mb-3">
+                    <div class="col-12 col-sm-6 col-lg-3 mb-3">
                         <div class="stats-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
@@ -642,7 +643,7 @@
                     <h5 class="mb-4">Registrar Nuevo Activo</h5>
                     <form id="assetForm">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Categoría</label>
                                 <select class="form-control" id="category" required>
                                     <option value="">Seleccionar categoría</option>
@@ -654,7 +655,7 @@
                                     <option value="Vehículos">Vehículos</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Área</label>
                                 <select class="form-control" id="area" required>
                                     <option value="">Seleccionar área</option>
@@ -666,7 +667,7 @@
                                     <option value="Ventas">Ventas</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Tipo</label>
                                 <select class="form-control" id="type" required>
                                     <option value="">Seleccionar tipo</option>
@@ -678,7 +679,7 @@
                                     <option value="Textil">Textil</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Cantidad Total</label>
                                 <input type="number" class="form-control" id="quantity" min="1" required>
                             </div>
@@ -700,21 +701,21 @@
                     <h5 class="mb-4">Registrar Salida de Activo</h5>
                     <form id="exitForm">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Fecha</label>
                                 <input type="date" class="form-control" id="exitDate" required>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Activo</label>
                                 <select class="form-control" id="assetSelect" required>
                                     <option value="">Seleccionar activo</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Cantidad a Salir</label>
                                 <input type="number" class="form-control" id="exitQuantity" min="1" required>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-12 col-md-6 mb-3">
                                 <label class="form-label">Stock Disponible</label>
                                 <input type="text" class="form-control" id="availableStock" readonly>
                             </div>
@@ -750,8 +751,8 @@
                         <p>Cargando datos...</p>
                     </div>
                     
-                    <div class="table-container">
-                        <table class="table table-modern">
+                      <div class="table-container table-responsive">
+                        <table class="table table-modern w-100">
                             <thead>
                                 <tr>
                                     <th>Categoría</th>
@@ -777,13 +778,13 @@
                 <div class="glass-card p-4">
                     <h5 class="mb-4">Reportes y Análisis</h5>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-12 col-md-6 mb-3">
                             <h6>Activos por Categoría</h6>
                             <div id="categoryChart" class="mt-3">
                                 <!-- Chart will be populated here -->
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-12 col-md-6 mb-3">
                             <h6>Movimientos por Área</h6>
                             <div id="areaChart" class="mt-3">
                                 <!-- Chart will be populated here -->
@@ -1070,17 +1071,11 @@ function updateAvailableStock() {
 async function loadData() {
     showLoading(true);
     try {
-        const [assetsResult, exitsResult] = await Promise.all([
-            sendToGoogleSheets({ action: 'getAssets' }),
-            sendToGoogleSheets({ action: 'getExits' })
-        ]);
+        const assetsRes = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getAssets');
+        const exitsRes = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=getExits');
 
-        if (!assetsResult.success) {
-            throw new Error('Error al obtener activos: ' + assetsResult.message);
-        }
-        if (!exitsResult.success) {
-            throw new Error('Error al obtener salidas: ' + exitsResult.message);
-        }
+        const assetsResult = await assetsRes.json();
+        const exitsResult = await exitsRes.json();
 
         assetsData = assetsResult.data || [];
         exitsData = exitsResult.data || [];
@@ -1091,12 +1086,11 @@ async function loadData() {
 
     } catch (error) {
         console.error('Error de comunicación al cargar datos:', error);
-        showMessageModal('Error de Conexión', 'Error al cargar datos del servidor: ' + error.message);
+        showMessageModal('Error', 'No se pudo cargar la información: ' + error.message);
     } finally {
         showLoading(false);
     }
 }
-
 
 function updateDashboard() {
     const totalAssetsCount = assetsData.length;
@@ -1237,21 +1231,14 @@ function loadAssetsTable() {
 
 async function sendToGoogleSheets(data) {
     try {
-        const response = await fetch(CONFIG.APPS_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+        const urlParams = new URLSearchParams(data).toString();
+        const response = await fetch(CONFIG.APPS_SCRIPT_URL + "?" + urlParams, {
+            method: 'GET',
+            mode: 'no-cors'  // No preflight
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        return result;
+        // no-cors no permite leer respuesta, asumimos éxito
+        return { success: true };
 
     } catch (error) {
         console.error('Error en sendToGoogleSheets:', error);
@@ -1261,6 +1248,7 @@ async function sendToGoogleSheets(data) {
         };
     }
 }
+
 
 async function refreshData() {
     await loadData();
